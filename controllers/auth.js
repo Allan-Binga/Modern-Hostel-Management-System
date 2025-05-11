@@ -3,23 +3,22 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-//Register Tenant
+// Register Tenant
 const signUpTenant = async (req, res) => {
   const { firstName, lastName, email, phoneNumber, password } = req.body;
-  //Verify existing fields
+
+  // Verify required fields
   if (!firstName || !lastName || !email || !phoneNumber || !password) {
-    return res.status(400).json({
-      message: "All fields are required.",
-    });
+    return res.status(400).json({ message: "All fields are required." });
   }
 
-  //Email Format Validation
+  // Email Format Validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return res.status(400).json({ message: "Invalid email format." });
   }
 
-  //Validate Password Strength
+  // Validate Password Strength
   const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
   if (!passwordRegex.test(password)) {
@@ -28,82 +27,74 @@ const signUpTenant = async (req, res) => {
         "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.",
     });
   }
+
   try {
-    //Check if tenant already exists by email
-    const checkTenantQuery = "SELECT * FROM tenants WHERE email = $1";
-    const existingTenant = await client.query(checkTenantQuery, [email]);
+    // Check if tenant already exists
+    const checkTenantQuery =
+      "SELECT * FROM tenants WHERE email = $1 OR phoneNumber = $2";
+    const existingTenant = await client.query(checkTenantQuery, [
+      email,
+      phoneNumber,
+    ]);
 
     if (existingTenant.rows.length > 0) {
-      return res
-        .status(409)
-        .json("You are already registered. Please login to proceed.");
-    }
-
-    //Check if tenant exists by phone number
-    const checkPhoneQuery = "SELECT * FROM tenants WHERE phoneNumber = $1";
-    const existingPhone = await client.query(checkPhoneQuery, [phoneNumber]);
-
-    if (existingPhone.rows.length > 0) {
       return res.status(409).json({
-        message:
-          "This phone number is already registered. Please use a different number.",
+        message: "Email or phone number already registered.",
       });
     }
 
-    //Hash the password
+    // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    //Generate and hash the auth token
+    // Generate and hash verification token
     const plainToken = crypto.randomBytes(32).toString("hex");
     const hashedToken = crypto
       .createHash("sha256")
       .update(plainToken)
       .digest("hex");
 
-    const verificationTokenExpiry = newDate(Date.now() + 2 * 60 * 1000);
+    const verificationTokenExpiry = new Date(Date.now() + 2 * 60 * 1000); // 2 minutes expiry
 
-    //Insert Tenant With Token
-    const insertTenantQuery = ` INSERT INTO tenants (
-      firstName,
-      lastName,
-      email,
-      phoneNumber,
-      password,
-      verificationToken,
-      verificationTokenExpiry,
-      isVerified
-    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-    RETURNING id, firstName, lastName, email, phoneNumber, apartmentNumber, leaseStartDate, leaseEndDate`;
+    // Insert Tenant
+    const insertTenantQuery = `
+      INSERT INTO tenants (
+        firstName, lastName, email, phoneNumber, password,
+        verificationToken, verificationTokenExpiry, isVerified
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id, firstName, lastName, email, phoneNumber;
+    `;
 
-    //Save to PostgreSQL
     const newTenant = await client.query(insertTenantQuery, [
       firstName,
       lastName,
       email,
       phoneNumber,
+      hashedPassword,
+      hashedToken,
       verificationTokenExpiry,
       false,
     ]);
 
-    const tenantId = newTenant.rows[0].digest;
-    await client.query("COMMIT");
-
-    res.status(201).json({ message: "You have registered successfully." });
+    res.status(201).json({
+      message: "You have registered successfully.",
+      tenant: newTenant.rows[0],
+    });
   } catch (error) {
-    console.error("Registration Error:", error);
-    res.status(500).json("Internal server error.");
+    console.error("Tenant Registration Error:", error);
+    res.status(500).json({ message: "Internal server error." });
   }
 };
 
-//Tenant Login
+// Tenant Login
 const signInTenant = async (req, res) => {
   const { email, password } = req.body;
 
-  if (req.cookies && req.cookies.tenantPrestigeSession) {
+  if (req.cookies?.tenantPrestigeSession) {
     return res.status(400).json({ message: "You are already logged in." });
   }
+
   try {
-    //Check if tenant exists by email
+    // Check if tenant exists
     const checkTenantQuery = "SELECT * FROM tenants WHERE email = $1";
     const tenant = await client.query(checkTenantQuery, [email]);
 
@@ -111,7 +102,7 @@ const signInTenant = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    // Check if the password is valid
+    // Verify password
     const isPasswordValid = await bcrypt.compare(
       password,
       tenant.rows[0].password
@@ -121,41 +112,198 @@ const signInTenant = async (req, res) => {
       return res.status(401).json({ message: "Invalid credentials." });
     }
 
-    //Create a JWT tenant token
+    // Create JWT
     const tenantToken = jwt.sign(
       {
-        tenant: tenant.rows[0].id,
-        role: "tenant",
-        firstName: tenant.rows[0].firstname,
+        id: tenant.rows[0].id,
+        role: "Tenant",
+        firstName: tenant.rows[0].firstName,
       },
       process.env.JWT_SECRET,
       { expiresIn: "24h" }
     );
 
-    //Set JWT in Cookie
+    // Set cookie
     res.cookie("tenantPrestigeSession", tenantToken, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000,
     });
-  } catch (error) {}
+
+    res.status(200).json({
+      message: "Sign in successful",
+      tenant: {
+        id: tenant.rows[0].id,
+        firstName: tenant.rows[0].firstName,
+        email: tenant.rows[0].email,
+      },
+    });
+  } catch (error) {
+    console.error("Tenant Login Error:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 
-//Admin Register
+// Tenant Logout
+const logoutTenant = async (req, res) => {
+  try {
+    if (!req.cookies?.tenantPrestigeSession) {
+      return res.status(400).json({ message: "You are not logged in." });
+    }
+
+    res.clearCookie("tenantPrestigeSession");
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Tenant Logout Error:", error);
+    res.status(500).json({ message: "Error occurred during logout." });
+  }
+};
+
+// Admin Register
 const signUpAdmin = async (req, res) => {
-  try {
-    
-  } catch (error) {
-    
-  }
-}
+  const { email, phoneNumber, password } = req.body;
 
-//Admin Login
+  // Verify required fields
+  if (!email || !phoneNumber || !password) {
+    return res.status(400).json({ message: "All fields are required." });
+  }
+
+  // Email Format Validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format." });
+  }
+
+  // Validate Password Strength
+  const passwordRegex =
+    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+  if (!passwordRegex.test(password)) {
+    return res.status(400).json({
+      message:
+        "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.",
+    });
+  }
+
+  try {
+    // Check if admin already exists
+    const checkAdminQuery =
+      "SELECT * FROM admins WHERE email = $1 OR phoneNumber = $2";
+    const existingAdmin = await client.query(checkAdminQuery, [
+      email,
+      phoneNumber,
+    ]);
+
+    if (existingAdmin.rows.length > 0) {
+      return res.status(409).json({
+        message: "Email or phone number already registered.",
+      });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Insert Admin
+    const insertAdminQuery = `
+      INSERT INTO admins (
+        email, phoneNumber, password
+      ) VALUES ($1, $2, $3)
+      RETURNING id, email, phoneNumber;
+    `;
+
+    const newAdmin = await client.query(insertAdminQuery, [
+      email,
+      phoneNumber,
+      hashedPassword,
+    ]);
+
+    res.status(201).json({
+      message: "You have registered successfully.",
+      admin: newAdmin.rows[0],
+    });
+  } catch (error) {
+    console.error("Admin Registration Error:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+// Admin Login
 const signInAdmin = async (req, res) => {
-  try {
-    
-  } catch (error) {
-    
-  }
-}
+  const { email, password } = req.body;
 
-module.exports = { signUpTenant, signInTenant, signUpAdmin, signInAdmin };
+  if (req.cookies?.adminPrestigeSession) {
+    return res.status(400).json({ message: "You are already logged in." });
+  }
+
+  try {
+    // Check if admin exists
+    const checkAdminQuery = "SELECT * FROM admins WHERE email = $1";
+    const admin = await client.query(checkAdminQuery, [email]);
+
+    if (admin.rows.length === 0) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    // Verify password
+    const isPasswordValid = await bcrypt.compare(
+      password,
+      admin.rows[0].password
+    );
+
+    if (!isPasswordValid) {
+      return res.status(401).json({ message: "Invalid credentials." });
+    }
+
+    // Create JWT
+    const adminToken = jwt.sign(
+      {
+        id: admin.rows[0].id,
+        role: "Administrator",
+        email: admin.rows[0].email,
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" }
+    );
+
+    // Set cookie
+    res.cookie("adminPrestigeSession", adminToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+
+    res.status(200).json({
+      message: "Sign in successful",
+      admin: {
+        id: admin.rows[0].id,
+        email: admin.rows[0].email,
+      },
+    });
+  } catch (error) {
+    console.error("Admin Login Error:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
+};
+
+// Admin Logout
+const logoutAdmin = async (req, res) => {
+  try {
+    if (!req.cookies?.adminPrestigeSession) {
+      return res.status(400).json({ message: "You are not logged in." });
+    }
+
+    res.clearCookie("adminPrestigeSession");
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    console.error("Admin Logout Error:", error);
+    res.status(500).json({ message: "Error occurred during logout." });
+  }
+};
+
+module.exports = {
+  signUpTenant,
+  signInTenant,
+  logoutTenant,
+  signUpAdmin,
+  signInAdmin,
+  logoutAdmin,
+};

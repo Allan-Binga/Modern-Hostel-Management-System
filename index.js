@@ -10,11 +10,14 @@ require("./config/db");
 dotenv.config();
 const app = express();
 
+//JSON
+app.use(express.json());
+
 //Cookie Parser
 app.use(cookieParser());
 
 //Routes
-app.use("/prestige-hostel", authRoute);
+app.use("/prestige-hostel/auth", authRoute);
 
 const PORT = process.env.PORT || 5900;
 
