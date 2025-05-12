@@ -4,8 +4,9 @@ const cors = require("cors");
 const path = require("cors");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth");
-const roomsRoute = require("./routes/rooms")
-const visitorsRoute = require("./routes/visitors")
+const roomsRoute = require("./routes/rooms");
+const visitorsRoute = require("./routes/visitors");
+const bookingRoute = require("./routes/booking");
 
 require("./config/db");
 
@@ -19,9 +20,10 @@ app.use(express.json());
 app.use(cookieParser());
 
 //Routes
-app.use("/prestige-hostel/auth", authRoute);
-app.use("/prestige-hostel/rooms", roomsRoute)
-app.use("/prestige-hostel/visitors", visitorsRoute)
+app.use("/prestige-hostel/v1/auth", authRoute);
+app.use("/prestige-hostel/v1/rooms", roomsRoute);
+app.use("/prestige-hostel/v1/visitors", visitorsRoute);
+app.use("/prestige-hostel/v1/booking", bookingRoute);
 
 const PORT = process.env.PORT || 5900;
 
