@@ -2,8 +2,10 @@ const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
 const path = require("cors");
-const authRoute = require("./routes/auth");
 const cookieParser = require("cookie-parser");
+const authRoute = require("./routes/auth");
+const roomsRoute = require("./routes/rooms")
+const visitorsRoute = require("./routes/visitors")
 
 require("./config/db");
 
@@ -18,6 +20,8 @@ app.use(cookieParser());
 
 //Routes
 app.use("/prestige-hostel/auth", authRoute);
+app.use("/prestige-hostel/rooms", roomsRoute)
+app.use("/prestige-hostel/visitors", visitorsRoute)
 
 const PORT = process.env.PORT || 5900;
 
