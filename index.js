@@ -7,6 +7,7 @@ const authRoute = require("./routes/auth");
 const roomsRoute = require("./routes/rooms");
 const visitorsRoute = require("./routes/visitors");
 const bookingRoute = require("./routes/booking");
+const issueRoute = require("./routes/issueReport");
 
 require("./config/db");
 
@@ -24,6 +25,7 @@ app.use("/prestige-hostel/v1/auth", authRoute);
 app.use("/prestige-hostel/v1/rooms", roomsRoute);
 app.use("/prestige-hostel/v1/visitors", visitorsRoute);
 app.use("/prestige-hostel/v1/booking", bookingRoute);
+app.use("/prestige-hostel/v1/issue", issueRoute);
 
 const PORT = process.env.PORT || 5900;
 

@@ -12,7 +12,8 @@ const getBookings = async (req, res) => {
 
 // Book a Room
 const bookARoom = async (req, res) => {
-  const { tenantId, roomId, checkInDate, checkOutDate } = req.body;
+  const { roomId, checkInDate, checkOutDate } = req.body;
+  const tenantId = req.tenantId;
 
   // Check if the tenant exists
   const tenant = await client.query("SELECT * FROM tenants WHERE id = $1", [

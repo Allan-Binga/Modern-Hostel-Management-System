@@ -1,0 +1,152 @@
+const client = require("../config/db");
+
+//Get All Issues
+const getAllIsues = async (req, res) => {
+  try {
+    const issues = await client.query("SELECT * FROM issues");
+    res.status(200).json(issues.rows);
+  } catch (error) {
+    res.status(500).json({ message: "Could not fetch issues." });
+  }
+};
+
+// Report an issue
+const reportIssue = async (req, res) => {
+  try {
+    const { issueDescription, category, priority } = req.body;
+    const tenantId = req.tenantId; // tenantId from middleware
+
+    // Validate required fields
+    if (!issueDescription || !category || !priority) {
+      return res.status(400).json({
+        error:
+          "Missing required fields: Issue description, category, and priority are required",
+      });
+    }
+
+    // Validate priority (must be High, Medium, or Low)
+    const validPriorities = ["HIGH", "MEDIUM", "LOW"];
+    if (!validPriorities.includes(priority.toUpperCase())) {
+      return res
+        .status(400)
+        .json({ error: "Invalid priority. Must be HIGH, MEDIUM, or LOW" });
+    }
+
+    // Set default values for the issue
+    const reported_date = new Date(); // Current timestamp
+    const status = "OPEN"; // Default status for a new issue
+
+    // Query the database for a technician with the matching category
+    const technicianQuery = `
+        SELECT * FROM technicians
+        WHERE specialty = $1
+        LIMIT 1;
+      `;
+    const technicianResult = await client.query(technicianQuery, [category]);
+
+    // If no technician found for the category, return an error
+    if (technicianResult.rows.length === 0) {
+      return res.status(404).json({
+        error: `No technician found for the specified category: ${category}`,
+      });
+    }
+
+    // Get the assigned technician
+    const assignedTechnician = technicianResult.rows[0];
+
+    // Insert the issue into the database with the assigned technician
+    const query = `
+        INSERT INTO issues (tenant_id, issue_description, category, priority, reported_date, status)
+        VALUES ($1, $2, $3, $4, $5, $6)
+        RETURNING issue_id;
+      `;
+    const values = [
+      tenantId,
+      issueDescription,
+      category,
+      priority.toUpperCase(),
+      reported_date,
+      status,
+    ];
+
+    const result = await client.query(query, values);
+
+    // Return success response with the new issue_id and technician assigned
+    return res.status(201).json({
+      message: "Issue reported successfully",
+      issue_id: result.rows[0].issue_id,
+      technician_assigned: assignedTechnician.name, // Technician's name
+      technician_phone: assignedTechnician.phone_number, // Technician's phone number
+    });
+  } catch (error) {
+    // Handle errors
+    console.error("Error reporting issue:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+//Resolve Issue
+const resolveIssue = async (req, res) => {
+  try {
+    const { issueId } = req.params;
+    const tenantId = req.tenantId;
+
+    // Validate required field
+    if (!issueId) {
+      return res.status(400).json({
+        error:
+          "Issue ID is required in the URL parameters.",
+      });
+    }
+
+    // Check if the issue exists and belongs to the tenant
+    const issueQuery = `
+      SELECT * FROM issues 
+      WHERE issue_id = $1 AND tenant_id = $2;
+    `;
+    const issueResult = await client.query(issueQuery, [issueId, tenantId]);
+
+    if (issueResult.rows.length === 0) {
+      return res.status(404).json({
+        error:
+          "Issue not found or you do not have permission to resolve this issue",
+      });
+    }
+
+    const issue = issueResult.rows[0];
+
+    // Ensure the issue is not already resolved
+    if (issue.status === "RESOLVED") {
+      return res.status(400).json({
+        error: "This issue is already resolved",
+      });
+    }
+
+    // Update the issue status to 'RESOLVED' and set resolved_date
+    const resolveDate = new Date();
+    const updateQuery = `
+      UPDATE issues 
+      SET status = 'RESOLVED', resolved_date = $1 
+      WHERE issue_id = $2 
+      RETURNING issue_id, status, resolved_date;
+    `;
+    const updateResult = await client.query(updateQuery, [
+      resolveDate,
+      issueId,
+    ]);
+
+    // Return success response with the updated issue information
+    return res.status(200).json({
+      message: "Issue resolved successfully",
+      issue_id: updateResult.rows[0].issue_id,
+      status: updateResult.rows[0].status,
+      resolved_date: updateResult.rows[0].resolved_date,
+    });
+  } catch (error) {
+    // Handle errors
+    console.error("Error resolving issue:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+module.exports = { getAllIsues, reportIssue, resolveIssue };

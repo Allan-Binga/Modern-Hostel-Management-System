@@ -134,7 +134,7 @@ const signInTenant = async (req, res) => {
       message: "Sign in successful",
       tenant: {
         id: tenant.rows[0].id,
-        firstName: tenant.rows[0].firstName,
+        firstName: tenant.rows[0].firstname,
         email: tenant.rows[0].email,
       },
     });
