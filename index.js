@@ -8,7 +8,9 @@ const roomsRoute = require("./routes/rooms");
 const visitorsRoute = require("./routes/visitors");
 const bookingRoute = require("./routes/booking");
 const issueRoute = require("./routes/issueReport");
-const advertRoute = require("./routes/adverts")
+const advertRoute = require("./routes/adverts");
+const checkoutRoute = require("./routes/rentCheckout");
+const webhookRoute = require("./routes/webhook")
 
 require("./config/db");
 
@@ -17,6 +19,9 @@ const app = express();
 
 //JSON
 app.use(express.json());
+
+//Webhook Route
+app.use("/prestige-hostel/v1/webhook", webhookRoute);
 
 //Cookie Parser
 app.use(cookieParser());
@@ -27,7 +32,8 @@ app.use("/prestige-hostel/v1/rooms", roomsRoute);
 app.use("/prestige-hostel/v1/visitors", visitorsRoute);
 app.use("/prestige-hostel/v1/booking", bookingRoute);
 app.use("/prestige-hostel/v1/issue", issueRoute);
-app.use("/prestige-hostel/v1/advertisements", advertRoute)
+app.use("/prestige-hostel/v1/advertisements", advertRoute);
+app.use("/prestige-hostel/v1/checkout", checkoutRoute);
 
 const PORT = process.env.PORT || 5900;
 
