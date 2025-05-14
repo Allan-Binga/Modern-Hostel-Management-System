@@ -6,7 +6,7 @@ const getAdvertisements = async (req, res) => {
     const advertisements = await client.query("SELECT * FROM advertisements");
     res.status(200).json(advertisements.rows);
   } catch (error) {
-    res.status(500).json;
+    res.status(500).json({message: "Failed to retrieve adverts."});
   }
 };
 

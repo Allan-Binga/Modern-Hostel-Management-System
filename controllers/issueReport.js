@@ -1,5 +1,9 @@
 const client = require("../config/db");
-const { sendIssueReportEmail } = require("./emailService");
+const {
+  sendIssueReportEmail,
+  technicianAssignmentEmail,
+} = require("./emailService");
+const { createNotification } = require("./notifications");
 
 //Get All Issues
 const getAllIsues = async (req, res) => {
@@ -79,6 +83,81 @@ const reportIssue = async (req, res) => {
   }
 };
 
+//Assign a technician
+const assignTechnician = async (req, res) => {
+  try {
+    const { issueId } = req.body;
+
+    // Validate required field
+    if (!issueId) {
+      return res.status(400).json({ error: "Issue ID is required." });
+    }
+
+    // Get issue details
+    const issueQuery = "SELECT * FROM issues WHERE issue_id = $1";
+    const issueResult = await client.query(issueQuery, [issueId]);
+
+    if (issueResult.rows.length === 0) {
+      return res.status(404).json({ error: "Issue not found." });
+    }
+
+    const issue = issueResult.rows[0];
+
+    // Find a technician with matching specialty
+    const technicianQuery =
+      "SELECT * FROM technicians WHERE specialty = $1 AND assignment_status = 'Unassigned' LIMIT 1";
+    const technicianResult = await client.query(technicianQuery, [
+      issue.category,
+    ]);
+
+    if (technicianResult.rows.length === 0) {
+      return res.status(404).json({
+        error: "No available technician with the required specialty.",
+      });
+    }
+
+    const technician = technicianResult.rows[0];
+
+    // Assign the technician to the issue
+    await client.query(
+      "UPDATE technicians SET assignment_status = 'Assigned' WHERE technician_id = $1",
+      [technician.technician_id]
+    );
+
+    await client.query(
+      "UPDATE technicians SET assignment_status = 'Assigned' WHERE technician_id = $1",
+      [technician.technician_id]
+    );
+
+    // Get tenant's email
+    const tenantQuery = "SELECT email FROM tenants WHERE id = $1";
+    const tenantResult = await client.query(tenantQuery, [issue.tenant_id]);
+
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: "Tenant not found." });
+    }
+
+    const tenantEmail = tenantResult.rows[0].email;
+
+    //Technician Assignment Email
+    await technicianAssignmentEmail(
+      tenantEmail,
+      technician.name,
+      technician.phone_number,
+      issue.category
+    );
+
+    return res.status(200).json({
+      message: "Technician assigned successfully.",
+      technician: technician.name,
+      issueId,
+    });
+  } catch (error) {
+    console.error("Error assigning technician:", error);
+    return res.status(500).json({ error: "Internal server error." });
+  }
+};
+
 //Resolve Issue
 const resolveIssue = async (req, res) => {
   try {
@@ -142,4 +221,4 @@ const resolveIssue = async (req, res) => {
   }
 };
 
-module.exports = { getAllIsues, reportIssue, resolveIssue };
+module.exports = { getAllIsues, reportIssue, resolveIssue, assignTechnician };

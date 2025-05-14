@@ -13,6 +13,7 @@ const checkoutRoute = require("./routes/rentCheckout");
 const webhookRoute = require("./routes/webhook")
 const emailRoute = require("./routes/emailService")
 const notificationRoute = require("./routes/notifications")
+const usersRoute = require("./routes/users")
 
 require("./config/db");
 
@@ -56,6 +57,7 @@ app.use("/prestige-hostel/v1/issue", issueRoute);
 app.use("/prestige-hostel/v1/advertisements", advertRoute);
 app.use("/prestige-hostel/v1/checkout", checkoutRoute);
 app.use("/prestige-hostel/v1/notifications", notificationRoute)
+app.use("/prestige-hostel/v1/users", usersRoute)
 
 const PORT = process.env.PORT || 5900;
 

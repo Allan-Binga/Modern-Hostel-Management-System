@@ -43,6 +43,16 @@ const signUpTenant = async (req, res) => {
       });
     }
 
+    // Check if email is already registered
+    // const checkEmailQuery = "SELECT * FROM tenants WHERE email = $1";
+    // const existingEmail = await client.query(checkEmailQuery, [email]);
+
+    // if (existingEmail.rows.length > 0) {
+    //   return res.status(409).json({
+    //     message: "This email is already registered.",
+    //   });
+    // }
+
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
