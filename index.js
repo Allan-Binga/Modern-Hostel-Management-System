@@ -25,6 +25,24 @@ app.use(express.json());
 //Webhook Route
 app.use("/prestige-hostel/v1/webhook", webhookRoute);
 
+//CORS Implementation
+const allowedOrigins = [
+  "http://localhost:5173"
+]
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    if(!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+    } else {
+      callback(new Error("Not allowed by CORS!"))
+    }
+  },
+  credentials: true
+}
+
+app.use(cors(corsOptions))
+
 //Cookie Parser
 app.use(cookieParser());
 
