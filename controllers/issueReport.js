@@ -1,4 +1,5 @@
 const client = require("../config/db");
+const { sendIssueReportEmail } = require("./emailService");
 
 //Get All Issues
 const getAllIsues = async (req, res) => {
@@ -36,25 +37,17 @@ const reportIssue = async (req, res) => {
     const reported_date = new Date(); // Current timestamp
     const status = "OPEN"; // Default status for a new issue
 
-    // Query the database for a technician with the matching category
-    const technicianQuery = `
-        SELECT * FROM technicians
-        WHERE specialty = $1
-        LIMIT 1;
-      `;
-    const technicianResult = await client.query(technicianQuery, [category]);
+    // Retrieve tenant email using tenantId
+    const emailQuery = `SELECT email FROM tenants WHERE id = $1;`;
+    const emailResult = await client.query(emailQuery, [tenantId]);
 
-    // If no technician found for the category, return an error
-    if (technicianResult.rows.length === 0) {
-      return res.status(404).json({
-        error: `No technician found for the specified category: ${category}`,
-      });
+    if (emailResult.rows.length === 0) {
+      return res.status(404).json({ error: "Tenant not found" });
     }
 
-    // Get the assigned technician
-    const assignedTechnician = technicianResult.rows[0];
+    const email = emailResult.rows[0].email;
 
-    // Insert the issue into the database with the assigned technician
+    // Insert the issue into the database without assigning a technician
     const query = `
         INSERT INTO issues (tenant_id, issue_description, category, priority, reported_date, status)
         VALUES ($1, $2, $3, $4, $5, $6)
@@ -71,12 +64,13 @@ const reportIssue = async (req, res) => {
 
     const result = await client.query(query, values);
 
-    // Return success response with the new issue_id and technician assigned
+    // Send the issue report email
+    await sendIssueReportEmail(email, category);
+
+    // Return success response with the new issue_id
     return res.status(201).json({
       message: "Issue reported successfully",
       issue_id: result.rows[0].issue_id,
-      technician_assigned: assignedTechnician.name, // Technician's name
-      technician_phone: assignedTechnician.phone_number, // Technician's phone number
     });
   } catch (error) {
     // Handle errors
@@ -94,8 +88,7 @@ const resolveIssue = async (req, res) => {
     // Validate required field
     if (!issueId) {
       return res.status(400).json({
-        error:
-          "Issue ID is required in the URL parameters.",
+        error: "Issue ID is required in the URL parameters.",
       });
     }
 

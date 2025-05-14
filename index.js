@@ -11,6 +11,7 @@ const issueRoute = require("./routes/issueReport");
 const advertRoute = require("./routes/adverts");
 const checkoutRoute = require("./routes/rentCheckout");
 const webhookRoute = require("./routes/webhook")
+const emailRoute = require("./routes/emailService")
 
 require("./config/db");
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 
 //Routes
 app.use("/prestige-hostel/v1/auth", authRoute);
+app.use("/prestige-hostel/v1/verify", emailRoute)
 app.use("/prestige-hostel/v1/rooms", roomsRoute);
 app.use("/prestige-hostel/v1/visitors", visitorsRoute);
 app.use("/prestige-hostel/v1/booking", bookingRoute);
