@@ -74,6 +74,7 @@ const mpesaCheckout = async (req, res) => {
     };
 
     console.log("Request Body:", JSON.stringify(requestBody, null, 2));
+    
 
     const qrResponse = await axios.post(url, requestBody, {
       headers: {
@@ -132,6 +133,7 @@ const createSTKPushNotification = async (req, res) => {
     const consumerKey = process.env.CONSUMER_KEY;
     const consumerSecret = process.env.CONSUMER_SECRET;
     const callbackUrl = process.env.CALLBACK_URL;
+    console.log("Callback URL:", callbackUrl);
 
     const timestamp = moment().format("YYYYMMDDHHmmss");
     const password = Buffer.from(`${shortcode}${passkey}${timestamp}`).toString(
