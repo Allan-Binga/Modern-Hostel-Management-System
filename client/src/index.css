@@ -1,1 +1,39 @@
+/* index.css */
 @import "tailwindcss";
+
+:root {
+  --burgundy-100: #F3E6E6;
+  --burgundy-200: #E6CCCC;
+  --burgundy-300: #CC9999;
+  --burgundy-400: #B36666;
+  --burgundy-500: #800200;
+  --burgundy-600: #660200;
+  --burgundy-700: #4D0100;
+  --burgundy-800: #330100;
+  --burgundy-900: #1A0000;
+}
+
+/* Using the custom colors as Tailwind utilities */
+.bg-burgundy-500 {
+  background-color: var(--burgundy-500) !important;
+}
+
+.text-burgundy-500 {
+  color: var(--burgundy-500) !important;
+}
+
+/* Custom Keyframes */
+@keyframes fadeIn {
+    0% {
+      opacity: 0;
+    }
+    100% {
+      opacity: 1;
+    }
+  }
+  
+  /* Custom Animation Utility */
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-in-out !important;
+  }
+  

@@ -1,8 +1,33 @@
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
+import LandingPage from "./pages/landingPage/LandingPage";
+import AdministratorHome from "./pages/Administrator/Home"
+import AdministratorSignup from "./pages/Administrator/Signup";
+import AdministratorLogin from "./pages/Administrator/Login"
+import TenantHome from "./pages/Tenant/Home";
+import TenantSignup from "./pages/Tenant/Signup";
+import TenantLogin from "./pages/Tenant/Login";
+import PasswordReset from "./pages/PasswordReset/PasswordReset"
+
 function App() {
   return (
-    <div className="text-center">
-      <div className="text-gray-800">Prestige</div>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Navigate to="/prestige-hostels"/>}/>
+        <Route path="/administrator/signup" element={<AdministratorSignup/>}/>
+        <Route path="/administrator/login" element={<AdministratorLogin/>}/>
+        <Route path="/administrator/home" element={<AdministratorHome/>}/>
+        <Route path="/prestige-hostels" element={<LandingPage/>}/>
+        <Route path="/home" element={<TenantHome/>}/>
+        <Route path="/signup" element={<TenantSignup/>}/>
+        <Route path="/login" element={<TenantLogin/>}/>
+        <Route path="/forgot-password" element={<PasswordReset/>}/>
+      </Routes>
+    </Router>
   );
 }
 
