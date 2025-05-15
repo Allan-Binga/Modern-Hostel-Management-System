@@ -1,10 +1,9 @@
 function App() {
-
   return (
-   <div>
-    Prestige
-   </div>
-  )
+    <div className="text-center">
+      <div className="text-gray-800">Prestige</div>
+    </div>
+  );
 }
 
-export default App
+export default App;
