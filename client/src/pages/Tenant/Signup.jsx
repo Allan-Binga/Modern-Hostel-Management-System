@@ -45,6 +45,11 @@ function TenantSignup() {
       {/* Right Section - Signup Form */}
       <div className="lg:w-1/2 w-full flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="max-w-md w-full space-y-6 flex flex-col items-center">
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-50">
+              <Spinner />
+            </div>
+          )}
           {/* Logo */}
           <div className="flex items-center justify-center">
             <img src={Logo} alt="Wealth Wave Logo" className="w-50 h-50" />
@@ -62,11 +67,6 @@ function TenantSignup() {
           )}
           {success && (
             <p className="text-green-600 text-sm text-center mt-4">{success}</p>
-          )}
-          {loading && (
-            <div className="flex justify-center my-4">
-              <Spinner />
-            </div>
           )}
 
           {/* Form */}

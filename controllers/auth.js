@@ -112,7 +112,7 @@ const signInTenant = async (req, res) => {
     const tenant = await client.query(checkTenantQuery, [email]);
 
     if (tenant.rows.length === 0) {
-      return res.status(401).json({ message: "Invalid credentials." });
+      return res.status(401).json({ message: "Invalid credentials. Please try again." });
     }
 
     // Verify password
@@ -122,7 +122,7 @@ const signInTenant = async (req, res) => {
     );
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials." });
+      return res.status(401).json({ message: "Invalid credentials. Please try again" });
     }
 
     // Create JWT

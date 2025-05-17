@@ -12,7 +12,6 @@ import { endpoint } from "../../backendAPI";
 function TenantLogin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -78,6 +77,11 @@ function TenantLogin() {
       {/* Right Section - Login Form */}
       <div className="lg:w-1/2 w-full flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="max-w-md w-full space-y-6 flex flex-col items-center">
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50">
+              <Spinner />
+            </div>
+          )}
           {/* Logo */}
           <div className="flex items-center justify-center">
             <img src={Logo} alt="Wealth Wave Logo" className="w-50 h-50" />
@@ -93,7 +97,6 @@ function TenantLogin() {
               Please login to proceed
             </h2>
           </div>
-
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6 w-full">
             <div>
