@@ -6,11 +6,63 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { ToastContainer, toast, Bounce } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
+import { endpoint } from "../../backendAPI";
 
 function TenantLogin() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${endpoint}/auth/tenant/sign-in`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed, please try again.");
+      }
+
+      localStorage.setItem("tenantId", data.tenant.id);
+
+      toast.success("Login successful.");
+      setTimeout(() => {
+        navigate("/home");
+      }, 4000);
+    } catch (error) {
+      const errorMessage = error.message?.toLowerCase?.();
+
+      if (errorMessage?.includes("already logged in")) {
+        toast.info("You are already logged in.", {
+          className:
+            "bg-blue-100 text-blue-800 font-medium rounded-md p-3 shadow",
+        });
+        navigate("/home");
+      } else {
+        toast.error(error.message || "Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -23,7 +75,7 @@ function TenantLogin() {
         />
       </div>
 
-      {/* Right Section - Signup Form */}
+      {/* Right Section - Login Form */}
       <div className="lg:w-1/2 w-full flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="max-w-md w-full space-y-6 flex flex-col items-center">
           {/* Logo */}
@@ -43,13 +95,16 @@ function TenantLogin() {
           </div>
 
           {/* Form */}
-          <form className="space-y-6 w-full">
+          <form onSubmit={handleSubmit} className="space-y-6 w-full">
             <div>
               <label className="block text-md font-medium text-gray-700">
                 Email
               </label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="johndoe@gmail.com"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
@@ -61,6 +116,9 @@ function TenantLogin() {
               </label>
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="••••••••"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
@@ -72,9 +130,10 @@ function TenantLogin() {
               </span>
             </div>
 
-            {/* Signup Button */}
+            {/* Login Button */}
             <button
               type="submit"
+              disabled={loading}
               className="w-full py-3 bg-burgundy-500 text-white rounded-full hover:bg-burgundy-400 transition duration-200 cursor-pointer"
             >
               SIGN IN
@@ -84,7 +143,10 @@ function TenantLogin() {
           {/* Sign In Link */}
           <p className="text-center text-md text-gray-600">
             Forgot Password?{" "}
-            <Link to="/forgot-password" className="text-burgundy-500 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-burgundy-500 hover:underline"
+            >
               Reset Here
             </Link>
           </p>

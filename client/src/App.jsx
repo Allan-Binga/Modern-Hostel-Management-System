@@ -15,6 +15,7 @@ import TenantHome from "./pages/Tenant/Home";
 import TenantSignup from "./pages/Tenant/Signup";
 import TenantLogin from "./pages/Tenant/Login";
 import PasswordReset from "./pages/PasswordReset/PasswordReset";
+import Verification from "./pages/AccountVerification/Verification";
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
         <Route path="/signup" element={<TenantSignup />} />
         <Route path="/login" element={<TenantLogin />} />
         <Route path="/forgot-password" element={<PasswordReset />} />
+        <Route path="/account-verification" element={<Verification />} />
       </Routes>
 
       {/* Global ToastContainer */}
