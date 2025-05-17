@@ -2,6 +2,8 @@ const client = require("../config/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const { sendVerificationEmail } = require("./emailService");
+const { createNotification } = require("./notifications");
 
 // Register Tenant
 const signUpTenant = async (req, res) => {
@@ -43,16 +45,6 @@ const signUpTenant = async (req, res) => {
       });
     }
 
-    // Check if email is already registered
-    // const checkEmailQuery = "SELECT * FROM tenants WHERE email = $1";
-    // const existingEmail = await client.query(checkEmailQuery, [email]);
-
-    // if (existingEmail.rows.length > 0) {
-    //   return res.status(409).json({
-    //     message: "This email is already registered.",
-    //   });
-    // }
-
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -84,6 +76,17 @@ const signUpTenant = async (req, res) => {
       verificationTokenExpiry,
       false,
     ]);
+
+    const tenantId = newTenant.rows[0].id;
+
+    // Send email with plainToken
+    await sendVerificationEmail(email, plainToken);
+
+    //Send notification
+    await createNotification(
+      tenantId,
+      "Thank you for signing up. Please check your email for an account verification instructions. If not in the inbox please look at the spam folder."
+    );
 
     res.status(201).json({
       message: "You have registered successfully.",

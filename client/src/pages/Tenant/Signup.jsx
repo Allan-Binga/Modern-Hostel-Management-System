@@ -6,12 +6,30 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { ToastContainer, toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-// import { endpoint } from "../../backendAPI.js";
+import { endpoint } from "../../backendAPI";
 
 function TenantSignup() {
   const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phoneNumber: "",
+    apartmentNumber: "",
+    password: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -39,8 +57,57 @@ function TenantSignup() {
             </h2>
           </div>
 
+          {error && (
+            <p className="text-red-600 text-sm text-center mt-4">{error}</p>
+          )}
+          {success && (
+            <p className="text-green-600 text-sm text-center mt-4">{success}</p>
+          )}
+          {loading && (
+            <div className="flex justify-center my-4">
+              <Spinner />
+            </div>
+          )}
+
           {/* Form */}
-          <form className="space-y-6 w-full">
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault();
+              setError("");
+              setSuccess("");
+              setLoading(true);
+
+              try {
+                const res = await fetch(`${endpoint}/auth/tenant/sign-up`, {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify(formData),
+                });
+
+                const data = await res.json();
+
+                if (!res.ok) {
+                  //Handle Password Related Errors
+                  if (data.message?.toLowerCase().includes("password")) {
+                    setFieldErrors({ password: data.message });
+                  } else {
+                    setFieldErrors({});
+                    toast.error(data.message || "Something went wrong.");
+                  }
+                  return;
+                }
+
+                setFieldErrors({});
+                toast.success(data.message);
+                setTimeout(() => navigate("/login"), 4000);
+              } catch (error) {
+                toast.error("Server error. Please try again.");
+              } finally {
+                setLoading(false);
+              }
+            }}
+            className="space-y-6 w-full"
+          >
             <div className="flex space-x-6">
               <div className="w-1/2">
                 <label className="block text-md font-medium text-gray-700">
@@ -48,6 +115,9 @@ function TenantSignup() {
                 </label>
                 <input
                   type="text"
+                  name="firstName"
+                  value={formData.firstName}
+                  onChange={handleChange}
                   placeholder="John"
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
                 />
@@ -58,6 +128,9 @@ function TenantSignup() {
                 </label>
                 <input
                   type="text"
+                  name="lastName"
+                  value={formData.lastName}
+                  onChange={handleChange}
                   placeholder="Doe"
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
                 />
@@ -68,18 +141,26 @@ function TenantSignup() {
               <label className="block text-md font-medium text-gray-700">
                 Phone
               </label>
-              <input
-                // type={}
+              <PhoneInput
+                country={"ke"} // Set your default country (Kenya in this case)
+                value={formData.phoneNumber}
+                onChange={(value) =>
+                  setFormData((prev) => ({ ...prev, phoneNumber: value }))
+                }
                 placeholder="0712345678"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                inputClass="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
+
             <div>
               <label className="block text-md font-medium text-gray-700">
                 Email
               </label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="johndoe@gmail.com"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
@@ -91,8 +172,20 @@ function TenantSignup() {
               </label>
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={(e) => {
+                  handleChange(e);
+                  setFieldErrors((prev) => ({ ...prev, password: "" })); // Clear error on input
+                }}
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className={`mt-1 block w-full border ${
+                  fieldErrors.password ? "border-red-500" : "border-gray-300"
+                } rounded-full shadow-sm py-2.5 px-4 text-sm focus:outline-none focus:ring-2 ${
+                  fieldErrors.password
+                    ? "focus:ring-red-500"
+                    : "focus:ring-blue-500"
+                }`}
               />
               <span
                 className="absolute right-3 top-10 text-gray-500 cursor-pointer"
@@ -100,14 +193,28 @@ function TenantSignup() {
               >
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </span>
+              {fieldErrors.password && (
+                <p className="text-red-500 text-xs mt-1">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             {/* Signup Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-burgundy-500 text-white rounded-full hover:bg-burgundy-400 transition duration-200 cursor-pointer"
+              className={`w-full py-3 text-white rounded-full transition duration-200 cursor-pointer ${
+                loading
+                  ? "bg-gray-400"
+                  : "bg-burgundy-500 hover:bg-burgundy-400"
+              } flex items-center justify-center`}
+              disabled={loading}
             >
-              SIGN UP
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-gray-300 rounded-full animate-spin border-t-transparent"></div>
+              ) : (
+                "SIGN UP"
+              )}
             </button>
           </form>
 
