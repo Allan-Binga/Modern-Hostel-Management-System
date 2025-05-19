@@ -96,7 +96,7 @@ function Navbar() {
             />
             <a
               href="/home"
-              className={`text-lg text-white hover:font-semibold${
+              className={`text-lg text-white hover:font-semibold ${
                 location.pathname === "/home"
                   ? " font-semibold"
                   : "hover:font-semibold cursor-pointer"
@@ -117,7 +117,7 @@ function Navbar() {
               size={26}
             />
             <a
-              className={`text-lg text-white hover:font-semibold${
+              className={`text-lg text-white hover:font-semibold ${
                 location.pathname === "/bookings"
                   ? " font-semibold"
                   : "hover:font-semibold cursor-pointer"
@@ -179,7 +179,7 @@ function Navbar() {
           >
             <button
               onClick={toggleDropdown}
-              className="flex items-center space-x-1 text-lg text-white hover:text-white focus:outline-none cursor-pointer"
+              className="flex items-center space-x-1 text-lg text-white hover:font-semibold focus:outline-none cursor-pointer"
             >
               <CircleUser size={26} />
               <span>Account</span>
