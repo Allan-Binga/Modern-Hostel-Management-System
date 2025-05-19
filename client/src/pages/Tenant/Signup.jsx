@@ -137,18 +137,26 @@ function TenantSignup() {
               </div>
             </div>
 
-            <div className="block text-md font-medium text-gray-700">
+            <div className="block text-md font-medium text-gray-700 w-full">
               <label className="block text-md font-medium text-gray-700">
                 Phone
               </label>
-              <PhoneInput
-                country={"ke"} // Set your default country (Kenya in this case)
+              <input
+                type="tel"
+                name="phoneNumber"
                 value={formData.phoneNumber}
-                onChange={(value) =>
-                  setFormData((prev) => ({ ...prev, phoneNumber: value }))
-                }
+                onChange={(e) => {
+                  // Allow only numeric input and limit length
+                  const formattedPhone = e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 12);
+                  setFormData((prev) => ({
+                    ...prev,
+                    phoneNumber: formattedPhone,
+                  }));
+                }}
                 placeholder="0712345678"
-                inputClass="w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
 
@@ -221,7 +229,7 @@ function TenantSignup() {
           {/* Sign In Link */}
           <p className="text-center text-md text-gray-600">
             Already have an account?{" "}
-            <Link to="/login" className="text-burgundy-500 hover:underline">
+            <Link to="/login" className="text-burgundy-500 font-semibold hover:text-pink-950 hover:underline">
               Sign In
             </Link>
           </p>
@@ -238,7 +246,7 @@ function TenantSignup() {
             Are you an administrator?{" "}
             <Link
               to="/administrator/signup"
-              className="text-burgundy-500 hover:underline"
+              className="text-burgundy-500 hover:underline font-semibold hover:text-pink-950"
             >
               Click Here
             </Link>

@@ -148,7 +148,7 @@ function TenantLogin() {
             Forgot Password?{" "}
             <Link
               to="/forgot-password"
-              className="text-burgundy-500 hover:underline"
+              className="text-burgundy-500 hover:underline font-semibold hover:text-pink-900"
             >
               Reset Here
             </Link>
@@ -156,7 +156,7 @@ function TenantLogin() {
 
           <p className="text-center text-md text-gray-600">
             Don't have an account?{" "}
-            <Link to="/signup" className="text-burgundy-500 hover:underline">
+            <Link to="/signup" className="text-burgundy-500 font-semibold hover:underline hover:text-pink-900">
               Sign Up
             </Link>
           </p>
@@ -173,7 +173,7 @@ function TenantLogin() {
             Are you an administrator?{" "}
             <Link
               to="/administrator/login"
-              className="text-burgundy-500 hover:underline"
+              className="text-burgundy-500 hover:underline font-semibold hover:text-pink-900"
             >
               Click Here
             </Link>

@@ -8,6 +8,9 @@ import {
   Proportions,
   CircleUser,
   ChevronDown,
+  User,
+  Settings,
+  LogOut,
 } from "lucide-react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -83,40 +86,89 @@ function Navbar() {
         </div>
 
         <ul className="hidden lg:flex lg:items-center lg:space-x-4">
-          <li className="flex items-center space-x-1 text-white">
-            <Home size={26} />
-            <a className="text-lg text-white hover:text-white" href="/home">
-              Home
-            </a>
-          </li>
-          <span className="text-white">|</span>
-
-          <li className="flex items-center space-x-1 text-white">
-            <BookUser size={26} />
-            <a className="text-lg text-white hover:text-white" href="/bookings">
-              Bookings
-            </a>
-          </li>
-          <span className="text-white">|</span>
-
-          <li className="flex items-center space-x-1 text-white">
-            <Megaphone size={26} />
+          <li className="flex items-center space-x-1 text-white hover:font-bold">
+            <Home
+              className={`${
+                location.pathname === "/home"
+                  ? " font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
+            />
             <a
-              className="text-lg text-white hover:text-white"
+              href="/home"
+              className={`text-lg text-white hover:font-semibold${
+                location.pathname === "/home"
+                  ? " font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
+            >
+              <span>Home</span>
+            </a>
+          </li>
+          <span className="text-white">|</span>
+
+          <li className="flex items-center space-x-1 text-white">
+            <BookUser
+              className={`${
+                location.pathname === "/bookings"
+                  ? "font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
+              size={26}
+            />
+            <a
+              className={`text-lg text-white hover:font-semibold${
+                location.pathname === "/bookings"
+                  ? " font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
+              href="/bookings"
+            >
+              <span>Bookings</span>
+            </a>
+          </li>
+          <span className="text-white">|</span>
+
+          <li className="flex items-center space-x-1 text-white">
+            <Megaphone
+              size={26}
+              className={`${
+                location.pathname === "/advertisements"
+                  ? "font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
+            />
+            <a
+              className={`text-lg text-white hover:font-semibold ${
+                location.pathname === "/advertisements"
+                  ? " font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
               href="/advertisements"
             >
-              Advertisements
+              <span>Advertisements</span>
             </a>
           </li>
           <span className="text-white">|</span>
 
           <li className="flex items-center space-x-1 text-white">
-            <Proportions size={26} />
+            <Proportions
+              size={26}
+              className={`${
+                location.pathname === "/issue-reports"
+                  ? "font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
+            />
             <a
-              className="text-lg text-white hover:text-white"
+              className={`text-lg text-white hover:font-semibold ${
+                location.pathname === "/issue-reports"
+                  ? " font-semibold"
+                  : "hover:font-semibold cursor-pointer"
+              }`}
               href="/issue-reports"
             >
-              Issue Reports
+              <span>Issue Reports</span>
             </a>
           </li>
           <span className="text-white">|</span>
@@ -143,24 +195,27 @@ function Navbar() {
                 <li>
                   <a
                     href="/profile"
-                    className="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    className="flex items-center px-6 py-3 hover:bg-gray-100 cursor-pointer"
                   >
+                    <User className="w-4 h-4 mr-2" />
                     Profile
                   </a>
                 </li>
                 <li>
                   <a
                     href="/account-settings"
-                    className="block px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    className="flex items-center px-6 py-3 hover:bg-gray-100 cursor-pointer"
                   >
+                    <Settings className="w-4 h-4 mr-2" />
                     Account Settings
                   </a>
                 </li>
                 <li>
                   <a
                     onClick={handleLogout}
-                    className="block px-4 py-2 hover:bg-red-100 cursor-pointer"
+                    className="flex items-center px-6 py-3 hover:bg-red-100 cursor-pointer"
                   >
+                    <LogOut className="w-4 h-4 mr-2" />
                     Logout
                   </a>
                 </li>

@@ -17,7 +17,7 @@ import PasswordReset from "./pages/PasswordReset/PasswordReset";
 import Verification from "./pages/AccountVerification/Verification";
 import IssueReport from "./pages/Reports/IssueReport";
 import Bookings from "./pages/Bookings/Bookings";
-import Advertisements from "./pages/Advertisements";
+import Advertisements from "./pages/Advertisements/Advertisements";
 import Contact from "./pages/Contact/Contact";
 import Profile from "./pages/Profile/Profile";
 import AccountSettings from "./pages/AccountSettings/AccountSettings";
@@ -52,9 +52,9 @@ function App() {
         newestOnTop={false}
         closeOnClick={true}
         rtl={false}
-        pauseOnFocusLoss
+        pauseOnFocusLoss={false}
         draggable
-        pauseOnHover
+        pauseOnHover={false}
         theme="light"
         transition={Slide}
       />
