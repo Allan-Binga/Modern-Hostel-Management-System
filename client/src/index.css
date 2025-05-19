@@ -13,54 +13,89 @@
   --burgundy-900: #1A0000;
 }
 
-/* Manually defining Tailwind-like classes for custom colors */
-.bg-burgundy-100 {
-  background-color: var(--burgundy-100) !important;
-}
+/* Custom Color Classes */
+.bg-burgundy-100 { background-color: var(--burgundy-100) !important; }
+.bg-burgundy-200 { background-color: var(--burgundy-200) !important; }
+.bg-burgundy-300 { background-color: var(--burgundy-300) !important; }
+.bg-burgundy-400 { background-color: var(--burgundy-400) !important; }
+.bg-burgundy-500 { background-color: var(--burgundy-500) !important; }
+.bg-burgundy-600 { background-color: var(--burgundy-600) !important; }
+.bg-burgundy-700 { background-color: var(--burgundy-700) !important; }
+.bg-burgundy-800 { background-color: var(--burgundy-800) !important; }
+.bg-burgundy-900 { background-color: var(--burgundy-900) !important; }
 
-.bg-burgundy-200 {
-  background-color: var(--burgundy-200) !important;
-}
-
-.bg-burgundy-300 {
-  background-color: var(--burgundy-300) !important;
-}
-
-.bg-burgundy-400 {
-  background-color: var(--burgundy-400) !important;
-}
-
-.bg-burgundy-500 {
-  background-color: var(--burgundy-500) !important;
-}
-
-.bg-burgundy-600 {
-  background-color: var(--burgundy-600) !important;
-}
-
-.bg-burgundy-700 {
-  background-color: var(--burgundy-700) !important;
-}
-
-.bg-burgundy-800 {
-  background-color: var(--burgundy-800) !important;
-}
-
-.bg-burgundy-900 {
-  background-color: var(--burgundy-900) !important;
-}
+.text-burgundy-100 { color: var(--burgundy-100) !important; }
+.text-burgundy-200 { color: var(--burgundy-200) !important; }
+.text-burgundy-300 { color: var(--burgundy-300) !important; }
+.text-burgundy-400 { color: var(--burgundy-400) !important; }
+.text-burgundy-500 { color: var(--burgundy-500) !important; }
+.text-burgundy-600 { color: var(--burgundy-600) !important; }
+.text-burgundy-700 { color: var(--burgundy-700) !important; }
+.text-burgundy-800 { color: var(--burgundy-800) !important; }
+.text-burgundy-900 { color: var(--burgundy-900) !important; }
 
 /* Custom Keyframes */
 @keyframes fadeIn {
-  0% {
-    opacity: 0;
-  }
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
 }
 
-/* Custom Animation Utility */
-.animate-fadeIn {
-  animation: fadeIn 0.5s ease-in-out !important;
+@keyframes slideIn {
+  0% { opacity: 0; transform: translateX(-20px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes stagger {
+  0% { opacity: 0; transform: translateY(10px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Animation Utilities */
+.animate-fadeIn { animation: fadeIn 0.6s ease-in-out !important; }
+.animate-slideIn { animation: slideIn 0.6s ease-in-out !important; }
+.animate-slideUp { animation: slideUp 0.6s ease-in-out !important; }
+.animate-stagger { animation: stagger 0.4s ease-in-out !important; }
+
+/* Custom Scrollbar */
+.scrollbar-custom {
+  scrollbar-width: thin;
+  scrollbar-color: var(--burgundy-400) var(--burgundy-100);
+}
+
+.scrollbar-custom::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-track {
+  background: var(--burgundy-100);
+  border-radius: 4px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb {
+  background: var(--burgundy-400);
+  border-radius: 4px;
+}
+
+.scrollbar-custom::-webkit-scrollbar-thumb:hover {
+  background: var(--burgundy-500);
+}
+
+/* Gradient Background */
+.bg-gradient-to-br {
+  background: linear-gradient(to bottom right, var(--burgundy-100), var(--burgundy-200));
+}
+
+/* Skeleton Loader */
+.animate-pulse {
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
 }

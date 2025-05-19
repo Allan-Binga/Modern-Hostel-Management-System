@@ -151,8 +151,17 @@ const getVisitors = async (req, res) => {
   }
 };
 
+//Fetch My Visitor
+const myVisitor = async (req, res) => {
+  try {
+    
+  } catch (error) {
+    
+  }
+}
+
 // //Get Active Visitors
 // const activeVisitors = async (req, res) => {
 
 // }
-module.exports = { getVisitors, signInVisitor, signOutVisitor };
+module.exports = { getVisitors, signInVisitor, signOutVisitor, myVisitor };
