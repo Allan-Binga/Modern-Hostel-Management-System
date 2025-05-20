@@ -1,4 +1,5 @@
 const client = require("../config/db");
+const { createNotification } = require("./notifications");
 
 //Fetch All Adverts
 const getAdvertisements = async (req, res) => {
@@ -6,7 +7,7 @@ const getAdvertisements = async (req, res) => {
     const advertisements = await client.query("SELECT * FROM advertisements");
     res.status(200).json(advertisements.rows);
   } catch (error) {
-    res.status(500).json({message: "Failed to retrieve adverts."});
+    res.status(500).json({ message: "Failed to retrieve adverts." });
   }
 };
 
@@ -78,6 +79,11 @@ const postAdvertisement = async (req, res) => {
     ];
 
     const result = await client.query(query, values);
+
+    await createNotification(
+      tenantId,
+      "Your advertisement was submitted successfully. Please wait for an approval from the administration."
+    );
 
     // Return success response with the new advertisement ID
     return res.status(201).json({

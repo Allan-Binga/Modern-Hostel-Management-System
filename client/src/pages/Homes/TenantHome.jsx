@@ -111,8 +111,8 @@ function TenantHome() {
 
           {/* Advertisements */}
           <section className="lg:w-2/5 bg-white rounded-3xl shadow-xl p-6 md:p-8 flex flex-col animate-slideUp" style={{ animationDelay: "0.2s" }}>
-            <h2 className="flex items-center gap-3 text-burgundy-700 text-2xl md:text-3xl font-extrabold mb-6">
-              <Tag size={32} /> Recent Advertisements
+            <h2 className="flex items-center gap-3 text-burgundy-700 text-2xl md:text-3xl font-bold mb-6">
+              <Tag size={32} /> Recent Advertisement
             </h2>
             {advertisements.length === 0 ? (
               <p className="text-gray-600 italic">No advertisements available.</p>
@@ -121,6 +121,7 @@ function TenantHome() {
                 {advertisements
                   .slice()
                   .sort((a, b) => new Date(b.submission_date) - new Date(a.submission_date))
+                  .slice(0, 1)
                   .map((ad, index) => (
                     <li
                       key={index}
@@ -162,7 +163,7 @@ function TenantHome() {
 
         {/* Modal for Advertisement Details */}
         {selectedAd && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700" onClick={closeModal}>
                 ✕

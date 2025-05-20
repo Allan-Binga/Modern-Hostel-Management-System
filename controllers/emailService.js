@@ -182,6 +182,41 @@ const sendIssueReportEmail = async (email, category) => {
   }
 };
 
+//Send Admin Email
+const sendIssueSubmissionEmailAdmin = async (
+  adminEmail,
+  tenantId,
+  category
+) => {
+  const subject = "New Issue Reported - Action Required";
+
+  const message = `
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.15);">
+        <h2 style="color: #333;">New Issue Reported</h2>
+        <p style="color: #555;">Dear Admin,</p>
+        <p style="color: #555;">A new issue has been reported by tenant with the id of ${tenantId} in the category of <strong>${category}</strong>.</p>
+        <p style="color: #555;">Please log in to the platform to assign a technician for this issue.</p>
+        <p style="margin-top: 20px; color: #777;">If you have any questions, please reach out to support.</p>
+      </div>
+    </div>
+  `;
+
+  const mailOptions = {
+    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
+    to: adminEmail,
+    subject: subject,
+    html: message,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log(`Admin notification email sent to ${adminEmail}`);
+  } catch (error) {
+    console.error("Error sending admin notification email:", error);
+  }
+};
+
 // Send Technician Assignment Email
 const technicianAssignmentEmail = async (
   email,
@@ -368,4 +403,5 @@ module.exports = {
   resendPasswordResetEmail,
   verifyPasswordResetToken,
   technicianAssignmentEmail,
+  sendIssueSubmissionEmailAdmin,
 };

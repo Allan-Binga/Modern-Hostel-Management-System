@@ -160,8 +160,4 @@ const myVisitor = async (req, res) => {
   }
 }
 
-// //Get Active Visitors
-// const activeVisitors = async (req, res) => {
-
-// }
 module.exports = { getVisitors, signInVisitor, signOutVisitor, myVisitor };

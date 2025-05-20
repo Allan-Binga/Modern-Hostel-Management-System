@@ -2,6 +2,7 @@ const client = require("../config/db");
 const {
   sendIssueReportEmail,
   technicianAssignmentEmail,
+  sendIssueSubmissionEmailAdmin,
 } = require("./emailService");
 const { createNotification } = require("./notifications");
 
@@ -12,6 +13,26 @@ const getAllIsues = async (req, res) => {
     res.status(200).json(issues.rows);
   } catch (error) {
     res.status(500).json({ message: "Could not fetch issues." });
+  }
+};
+
+//Get My Requests
+const getMyReportIssues = async (req, res) => {
+  try {
+    const tenantId = req.tenantId;
+
+    const query = `
+    SELECT * FROM issues
+    WHERE tenant_id = $1
+    ORDER BY reported_date DESC;
+    `;
+
+    const result = await client.query(query, [tenantId]);
+
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching your issue reports.");
+    res.status(500).json({ message: "Failed to fetch your issue reports." });
   }
 };
 
@@ -68,8 +89,21 @@ const reportIssue = async (req, res) => {
 
     const result = await client.query(query, values);
 
+    // Retrieve admin email
+    const adminQuery = `SELECT email FROM admins LIMIT 1;`;
+    const adminResult = await client.query(adminQuery);
+
+    if (adminResult.rows.length === 0) {
+      return res.status(400).json({ error: "Administrator not found." });
+    }
+
+    const adminEmail = adminResult.rows[0].email;
+    console.log(adminEmail);
+
     // Send the issue report email
     await sendIssueReportEmail(email, category);
+
+    await sendIssueSubmissionEmailAdmin(adminEmail, category, tenantId);
 
     // Return success response with the new issue_id
     return res.status(201).json({
@@ -147,6 +181,9 @@ const assignTechnician = async (req, res) => {
       issue.category
     );
 
+    //Notification Creation
+    // await createNotification(tenantId, )
+
     return res.status(200).json({
       message: "Technician assigned successfully.",
       technician: technician.name,
@@ -207,6 +244,12 @@ const resolveIssue = async (req, res) => {
       issueId,
     ]);
 
+    //Create resolution notification
+    await createNotification(
+      tenantId,
+      "Thank you, your recent issue report was resolved."
+    );
+
     // Return success response with the updated issue information
     return res.status(200).json({
       message: "Issue resolved successfully",
@@ -221,4 +264,10 @@ const resolveIssue = async (req, res) => {
   }
 };
 
-module.exports = { getAllIsues, reportIssue, resolveIssue, assignTechnician };
+module.exports = {
+  getAllIsues,
+  getMyReportIssues,
+  reportIssue,
+  resolveIssue,
+  assignTechnician,
+};
