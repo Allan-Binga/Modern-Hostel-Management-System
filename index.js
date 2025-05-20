@@ -4,6 +4,7 @@ const cors = require("cors");
 const path = require("cors");
 const cookieParser = require("cookie-parser");
 const authRoute = require("./routes/auth");
+const tenantRoute = require("./routes/tenants")
 const roomsRoute = require("./routes/rooms");
 const visitorsRoute = require("./routes/visitors");
 const bookingRoute = require("./routes/booking");
@@ -50,6 +51,7 @@ app.use(cookieParser());
 //Routes
 app.use("/prestige-hostel/v1/auth", authRoute);
 app.use("/prestige-hostel/v1/verify", emailRoute)
+app.use("/prestige-hostel/v1/tenants", tenantRoute)
 app.use("/prestige-hostel/v1/rooms", roomsRoute);
 app.use("/prestige-hostel/v1/visitors", visitorsRoute);
 app.use("/prestige-hostel/v1/booking", bookingRoute);
