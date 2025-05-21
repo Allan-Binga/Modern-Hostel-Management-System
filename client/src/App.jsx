@@ -22,6 +22,8 @@ import Contact from "./pages/Contact/Contact";
 import Profile from "./pages/Profile/Profile";
 import AccountSettings from "./pages/AccountSettings/AccountSettings";
 import Messages from "./pages/Messages/Messages";
+import Success from "./pages/PaymentSuccess/Success";
+import Failure from "./pages/PaymentFailure/Failure"
 
 function App() {
   return (
@@ -44,6 +46,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/account-settings" element={<AccountSettings />} />
         <Route path="/messages" element={<Messages/>}/>
+        <Route path="/payment/success" element={<Success/>}/>
+        <Route path="/payment/failure" element={<Failure/>}/>
       </Routes>
 
       {/* Global ToastContainer */}

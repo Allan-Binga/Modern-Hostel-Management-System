@@ -268,6 +268,43 @@ const technicianAssignmentEmail = async (
   }
 };
 
+//Send Payment Failure Email
+const sendPaymentFailureEmail = async (email) => {
+  const subject = "Failed Rent Payment Attempt";
+
+  const message = ` 
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.15);">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <img src="cid:logo" alt="Prestige Girls Hostels" style="max-width: 200px; max-height: 200px;" />
+        </div>
+        <h2 style="color: #333; margin-bottom: 10px;">Recent Failed Payment Attempt</h2>
+        <p style="color: #555;">Hello,</p>
+        <p style="color: #555;">We recently received a failed payment attempt. Don't fret. Please retry again via Prestige Girls Portal. <strong> ${category}</strong></p> 
+      </div>
+    </div>`;
+
+  const mailOptions = {
+    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
+    to: email,
+    subject: subject,
+    html: message,
+    attachments: [
+      {
+        filename: "prestigeLogo.png",
+        path: "./assets/prestigeLogo.png",
+        cid: "logo",
+      },
+    ],
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw error;
+  }
+};
+
 // Password Reset Email
 const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.CLIENT_URL}/password/reset?token=${token}`;
@@ -400,6 +437,7 @@ module.exports = {
   resendVerificationEmail,
   sendIssueReportEmail,
   sendPasswordResetEmail,
+  sendPaymentFailureEmail,
   resendPasswordResetEmail,
   verifyPasswordResetToken,
   technicianAssignmentEmail,

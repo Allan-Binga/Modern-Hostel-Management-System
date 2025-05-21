@@ -14,7 +14,7 @@ const getAdvertisements = async (req, res) => {
 //Get User's Advertisements
 const getUsersAdvertisement = async (req, res) => {
   const tenantId = req.tenantId;
-  console.log(tenantId);
+  // console.log(tenantId);
   try {
     const query = `SELECT * FROM advertisements WHERE tenant_id = $1 ORDER BY duration_days DESC`;
     const result = await client.query(query, [tenantId]);

@@ -10,10 +10,24 @@ const getBookings = async (req, res) => {
   }
 };
 
+//Get My Booking
+const usersBookings = async (req, res) => {
+  const tenantId = req.tenantId;
+  try {
+    const query = `SELECT * FROM bookings WHERE tenant_id = $1`;
+    const result = await client.query(query, [tenantId]);
+    res.status(200).json(result.rows);
+  } catch (error) {
+    console.error("Error fetching bookings.");
+    res.status(500).json({ message: "Could not fetch user's bookings." });
+  }
+};
+
 // Book a Room
 const bookARoom = async (req, res) => {
   const { roomId, checkInDate, checkOutDate } = req.body;
   const tenantId = req.tenantId;
+  console.log(tenantId);
 
   // Check if the tenant exists
   const tenant = await client.query("SELECT * FROM tenants WHERE id = $1", [
@@ -74,4 +88,4 @@ const bookARoom = async (req, res) => {
   }
 };
 
-module.exports = { getBookings, bookARoom };
+module.exports = { getBookings, bookARoom, usersBookings };

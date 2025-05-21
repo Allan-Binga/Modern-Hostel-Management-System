@@ -18,7 +18,7 @@ const createNotification = async (tenantId, message) => {
            VALUES ($1, $2)`,
       [tenantId, message]
     );
-    console.log("Notification created.");
+    // console.log("Notification created.");
   } catch (error) {
     console.error("Error creating notification:", error);
   }

@@ -98,7 +98,7 @@ const reportIssue = async (req, res) => {
     }
 
     const adminEmail = adminResult.rows[0].email;
-    console.log(adminEmail);
+    // w
 
     // Send the issue report email
     await sendIssueReportEmail(email, category);

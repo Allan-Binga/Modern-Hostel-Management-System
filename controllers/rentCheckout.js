@@ -2,8 +2,118 @@ const client = require("../config/db");
 const axios = require("axios");
 const moment = require("moment");
 const dotenv = require("dotenv");
+const Stripe = require("stripe");
+const { sendPaymentFailureEmail } = require("./emailService");
 
 dotenv.config();
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+//Create a Stripe checkout
+const createStripeCheckoutSession = async (req, res) => {
+  const tenantId = req.tenantId;
+
+  try {
+    //Find tenant room number
+    const tenantQuery = `SELECT room_id FROM bookings WHERE tenant_id = $1`;
+    const tenantResult = await client.query(tenantQuery, [tenantId]);
+
+    if (tenantResult.rows.length === 0) {
+      return res.status(404).json({ error: "Tenant not found." });
+    }
+
+    //Find Tenant's Email
+    const emailQuery = `SELECT email FROM tenants WHERE id = $1`;
+    const emailResult = await client.query(emailQuery, [tenantId]);
+
+    if (emailResult.rows.length === 0) {
+      return res.status(404).json({ error: "Email not found." });
+    }
+
+    const { roomnumber: roomNumber, email: tenantEmail } = tenantResult.rows[0];
+
+    //Get Rent Amount from Rooms Listings
+    const rentQuery = `SELECT price, IMAGE FROM rooms WHERE roomid = $1`;
+    const rentResult = await client.query(rentQuery, [roomNumber]);
+
+    if (rentResult.rows.length === 0) {
+      return res.status(404).json({ error: "Room not found." });
+    }
+
+    const { price: rentAmount, image: roomImage } = rentResult.rows[0];
+
+    //Current Date
+    const today = new Date().toISOString().split("T")[0];
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    const thirtyDaysAgoString = thirtyDaysAgo.toISOString().split("T")[0];
+
+    //Check if any payment was made in the previous 30 days
+    const paymentCheckQuery = `
+      SELECT * FROM payment
+      WHERE tenantid = $1
+        AND paymentdate > $2
+        AND paymentstatus = 'pending' 
+    `;
+
+    const paymentCheckResult = await client.query(paymentCheckQuery, [
+      tenantId,
+      thirtyDaysAgoString,
+    ]);
+
+    if (paymentCheckResult.rows.length > 0) {
+      return res.status(400).json({
+        error:
+          "You have already paid rent within the last 30 days. Please try again later.",
+      });
+    }
+
+    const insertPaymentQuery = `INSERT INTO payments (tenant_id, amount, payment_date, payment_method, payment_status) VALUES ($1, $2, $3, $4, $5) RETURNING payment_id`;
+
+    const values = [tenantId, rentAmount, today, "Stripe", "Pending"];
+    const result = await client.query.query(insertPaymentQuery, values);
+    const paymentId = result.rows[0].payment_id;
+
+    //Stripe Session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "kes",
+            product_data: {
+              name: `Rent payment for <TenantName> for the month of <Month>`,
+              images: roomImage ? [roomImage] : [],
+            },
+            unit_amount: rentAmount * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      success_url: `${process.env.CLIENT_URL}/payments/success`,
+      cancel_url: `${process.env.CLIENT_URL}/payments/failured`,
+      metadata: {
+        paymentId: paymentId.toString(),
+        tenantId: tenantId.toString(),
+        roomNumber: roomNumber.toString(),
+      },
+      payment_intend_data: {
+        metadata: {
+          paymentId: paymentId.toString(),
+          tenantId: tenantId.toString(),
+          roomNumber: roomNumber.toString(),
+        },
+      },
+    });
+
+    res.status(200).json({ id: session.id, url: session.url });
+  } catch (error) {
+    console.error("Error creating rent checkout session:", error.message);
+    res.status(500).json({ error: "Failed to create checkout session." , error});
+
+    // await sendPaymentFailureEmail(tenantEmail)
+  }
+};
 
 //Generate QR for payments
 const mpesaCheckout = async (req, res) => {
@@ -74,7 +184,6 @@ const mpesaCheckout = async (req, res) => {
     };
 
     console.log("Request Body:", JSON.stringify(requestBody, null, 2));
-    
 
     const qrResponse = await axios.post(url, requestBody, {
       headers: {
@@ -191,4 +300,8 @@ const createSTKPushNotification = async (req, res) => {
   }
 };
 
-module.exports = { mpesaCheckout, createSTKPushNotification };
+module.exports = {
+  mpesaCheckout,
+  createSTKPushNotification,
+  createStripeCheckoutSession,
+};

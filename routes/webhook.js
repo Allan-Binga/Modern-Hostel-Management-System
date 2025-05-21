@@ -4,9 +4,17 @@ const {
   validatePayment,
   confirmPayment,
   handleCallback,
+  handleStripeWebhook,
 } = require("../controllers/webhook");
 
 const router = express.Router();
+
+//Stripe Webhooks Handling
+router.post(
+  "/",
+  express.raw({ type: "application/json" }),
+  handleStripeWebhook
+);
 
 //Callback URL
 router.post("/callback", handleCallback);
