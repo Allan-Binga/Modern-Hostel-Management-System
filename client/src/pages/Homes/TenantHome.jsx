@@ -146,17 +146,17 @@ function TenantHome() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* My Room Details */}
-          <section className="lg:w-3/5 bg-white rounded-3xl shadow-xl p-8 md:p-10 transition-transform hover:scale-[1.02] animate-slideUp">
+          <section className="lg:w-3/5 bg-white rounded-3xl shadow-xl p-8 md:p-10 transition-transform hover:scale-[1.02] animate-slideUp relative min-h-[300px]">
             <h2 className="flex items-center gap-3 text-burgundy-700 text-3xl md:text-4xl font-extrabold mb-6">
               <Home size={36} /> My Room
             </h2>
             {loading ? (
-              <div className="flex justify-center items-center h-40">
-                <Spinner />
+              <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-80 transition-opacity duration-300">
+                <Spinner size="large" />
               </div>
             ) : tenant ? (
               myRoom ? (
-                <div className="space-y-6 text-gray-800 text-lg">
+                <div className="space-y-6 text-gray-800 text-lg transition-opacity duration-300">
                   {myRoom.image && (
                     <div className="w-full aspect-video mb-4">
                       <img
@@ -225,15 +225,15 @@ function TenantHome() {
 
           {/* Recent Advertisement */}
           <section
-            className="lg:w-2/5 bg-white rounded-3xl shadow-xl p-6 md:p-8 flex flex-col animate-slideUp"
+            className="lg:w-2/5 bg-white rounded-3xl shadow-xl p-6 md:p-8 flex flex-col animate-slideUp relative min-h-[300px]"
             style={{ animationDelay: "0.2s" }}
           >
             <h2 className="flex items-center gap-3 text-burgundy-700 text-2xl md:text-3xl font-extrabold mb-6">
               <Tag size={36} /> Recent Advertisement
             </h2>
             {loading ? (
-              <div className="flex justify-center items-center h-40">
-                <Spinner />
+              <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-80 transition-opacity duration-300">
+                <Spinner size="medium" />
               </div>
             ) : advertisements.length === 0 ? (
               <p className="text-gray-600 italic">
@@ -317,7 +317,7 @@ function TenantHome() {
         </div>
 
         {/* Available Rooms */}
-        <section className="mt-12">
+        <section className="mt-12 relative min-h-[400px]">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-extrabold text-burgundy-800 flex items-center gap-3">
               <Bed size={36} /> Available Rooms
@@ -335,8 +335,8 @@ function TenantHome() {
             </select>
           </div>
           {loading ? (
-            <div className="flex justify-center items-center h-40">
-              <Spinner />
+            <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-80 transition-opacity duration-300">
+              <Spinner size="large" />
             </div>
           ) : filteredRooms.length === 0 ? (
             <p className="text-gray-600 italic">
