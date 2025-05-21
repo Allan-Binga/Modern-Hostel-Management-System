@@ -5,7 +5,14 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { endpoint } from "../../backendAPI";
 import { toast } from "react-toastify";
-import { AlertCircle, Clock, Tag, Calendar, CheckCircle } from "lucide-react";
+import {
+  AlertCircle,
+  Clock,
+  Tag,
+  Calendar,
+  CheckCircle,
+  X,
+} from "lucide-react";
 
 function IssueReport() {
   const [issueReports, setIssueReports] = useState([]);
@@ -124,7 +131,7 @@ function IssueReport() {
                 {issueReports.map((report, index) => (
                   <li
                     key={index}
-                    className="border border-burgundy-300 rounded-2xl p-5 hover:shadow-sm hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                    className="border border-gray-300 rounded-2xl p-5 hover:shadow-sm hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
                     style={{ animationDelay: `${0.1 * index}s` }}
                     onClick={() => handleReportClick(report)}
                   >
@@ -182,7 +189,7 @@ function IssueReport() {
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowModal(false)}
               >
-                X
+                <X />
               </button>
               <h2 className="text-2xl font-bold text-burgundy-800 mb-4">
                 Report an Issue
@@ -202,7 +209,7 @@ function IssueReport() {
                       })
                     }
                     placeholder="Describe your issue"
-                    className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                     rows="4"
                     required
                   />
@@ -217,7 +224,7 @@ function IssueReport() {
                     onChange={(e) =>
                       setFormData({ ...formData, category: e.target.value })
                     }
-                    className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                     required
                   >
                     <option value="">Select Category</option>
@@ -238,7 +245,7 @@ function IssueReport() {
                     onChange={(e) =>
                       setFormData({ ...formData, priority: e.target.value })
                     }
-                    className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                     required
                   >
                     <option value="">Select Priority</option>

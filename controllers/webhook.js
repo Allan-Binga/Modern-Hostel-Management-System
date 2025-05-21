@@ -11,7 +11,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 const handleStripeWebhook = async (req, res) => {
   const endpointSecret = process.env.STRIPE_WEBHOOK;
   const sig = req.headers["stripe-signature"];
-  const tenantId = req.tenantId;
 
   let event;
 
@@ -26,6 +25,7 @@ const handleStripeWebhook = async (req, res) => {
     case "checkout.session.completed":
       const session = event.data.object;
       const paymentId = session.metadata?.paymentId;
+      const tenantId = session.metadata?.tenantId;
       const roomNumber = session.metadata?.roomNumber;
 
       try {
@@ -57,6 +57,11 @@ const handleStripeWebhook = async (req, res) => {
         await client.query(updateQuery, ["Paid", paymentId]);
         console.log(`Payment ${paymentId} marked as paid.`);
 
+        //Update Booking payment Status:
+        const updateBookingQuery = `UPDATE bookings SET payment_status = $1 WHERE tenant_id = $2`;
+        await client.query(updateBookingQuery, ["Paid", tenantId]);
+        console.log(`Booking for tenant ${tenantId} marked as paid.`);
+
         const {
           firstname,
           lastname,
@@ -83,7 +88,7 @@ const handleStripeWebhook = async (req, res) => {
           await client.query(updateQuery, ["Failed", failedPaymentId]);
           console.log(`Payment ${failedPaymentId} marked as failed`);
         }
-        return res.status(200).send("Webhook received and processes.");
+        return res.status(200).send("Webhook received and processed.");
       } catch (error) {
         console.error("Failed to mark payment as failed:", error.message);
         return res.status(500).send("Internal server error.");

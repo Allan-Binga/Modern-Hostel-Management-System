@@ -29,10 +29,11 @@ const createStripeCheckoutSession = async (req, res) => {
       return res.status(404).json({ error: "Email not found." });
     }
 
-    const { roomnumber: roomNumber, email: tenantEmail } = tenantResult.rows[0];
+    const roomNumber = tenantResult.rows[0].room_id;
+    const tenantEmail = emailResult.rows[0].email;
 
     //Get Rent Amount from Rooms Listings
-    const rentQuery = `SELECT price, IMAGE FROM rooms WHERE roomid = $1`;
+    const rentQuery = `SELECT price, image FROM rooms WHERE roomid = $1`;
     const rentResult = await client.query(rentQuery, [roomNumber]);
 
     if (rentResult.rows.length === 0) {
@@ -49,10 +50,10 @@ const createStripeCheckoutSession = async (req, res) => {
 
     //Check if any payment was made in the previous 30 days
     const paymentCheckQuery = `
-      SELECT * FROM payment
-      WHERE tenantid = $1
-        AND paymentdate > $2
-        AND paymentstatus = 'pending' 
+      SELECT * FROM payments
+      WHERE tenant_id = $1
+        AND payment_date > $2
+        AND payment_status = 'pending' 
     `;
 
     const paymentCheckResult = await client.query(paymentCheckQuery, [
@@ -70,7 +71,7 @@ const createStripeCheckoutSession = async (req, res) => {
     const insertPaymentQuery = `INSERT INTO payments (tenant_id, amount, payment_date, payment_method, payment_status) VALUES ($1, $2, $3, $4, $5) RETURNING payment_id`;
 
     const values = [tenantId, rentAmount, today, "Stripe", "Pending"];
-    const result = await client.query.query(insertPaymentQuery, values);
+    const result = await client.query(insertPaymentQuery, values);
     const paymentId = result.rows[0].payment_id;
 
     //Stripe Session
@@ -91,13 +92,13 @@ const createStripeCheckoutSession = async (req, res) => {
       ],
       mode: "payment",
       success_url: `${process.env.CLIENT_URL}/payments/success`,
-      cancel_url: `${process.env.CLIENT_URL}/payments/failured`,
+      cancel_url: `${process.env.CLIENT_URL}/payments/failure`,
       metadata: {
         paymentId: paymentId.toString(),
         tenantId: tenantId.toString(),
         roomNumber: roomNumber.toString(),
       },
-      payment_intend_data: {
+      payment_intent_data: {
         metadata: {
           paymentId: paymentId.toString(),
           tenantId: tenantId.toString(),
@@ -109,7 +110,9 @@ const createStripeCheckoutSession = async (req, res) => {
     res.status(200).json({ id: session.id, url: session.url });
   } catch (error) {
     console.error("Error creating rent checkout session:", error.message);
-    res.status(500).json({ error: "Failed to create checkout session." , error});
+    res
+      .status(500)
+      .json({ error: "Failed to create checkout session.", error });
 
     // await sendPaymentFailureEmail(tenantEmail)
   }

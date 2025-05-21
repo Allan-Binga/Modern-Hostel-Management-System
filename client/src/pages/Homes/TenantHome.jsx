@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { endpoint } from "../../backendAPI";
 import Navbar from "../../components/Navbar";
@@ -14,6 +15,8 @@ import {
   BanknoteArrowUp,
   MessageSquare,
   Filter,
+  CheckCircle,
+  X,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -26,7 +29,17 @@ function TenantHome() {
   const [loading, setLoading] = useState(false);
   const [selectedAd, setSelectedAd] = useState(null);
   const [roomFilter, setRoomFilter] = useState("");
+  const [bookingModal, setBookingModal] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [formData, setFormData] = useState({
+    roomId: "",
+    checkInDate: "",
+    checkOutDate: "",
+  });
+  const navigate = useNavigate();
+  // const [proceedToCheckoutModal, setProceedToCheckoutModal] = useState(false);
 
+  // Fetch tenant details
   useEffect(() => {
     const fetchDetails = async () => {
       setLoading(true);
@@ -57,6 +70,7 @@ function TenantHome() {
     fetchDetails();
   }, []);
 
+  // Fetch advertisements
   useEffect(() => {
     axios
       .get(`${endpoint}/advertisements/all`, { withCredentials: true })
@@ -67,14 +81,20 @@ function TenantHome() {
       });
   }, []);
 
+  // Fetch rooms
   useEffect(() => {
-    axios
-      .get(`${endpoint}/rooms/all-rooms`, { withCredentials: true })
-      .then((res) => setRooms(res.data))
-      .catch(() => {
+    const fetchRooms = async () => {
+      try {
+        const res = await axios.get(`${endpoint}/rooms/all-rooms`, {
+          withCredentials: true,
+        });
+        setRooms(res.data);
+      } catch {
         toast.error("Failed to fetch rooms.");
         console.error("Failed to fetch rooms.");
-      });
+      }
+    };
+    fetchRooms();
   }, []);
 
   const handleAdClick = (ad) => {
@@ -83,6 +103,48 @@ function TenantHome() {
 
   const closeModal = () => {
     setSelectedAd(null);
+    setBookingModal(false);
+    setFormData({ roomId: "", checkInDate: "", checkOutDate: "" });
+  };
+
+  const handleBookClick = (room) => {
+    setSelectedRoom(room);
+    setFormData({ ...formData, roomId: room.roomid });
+    setBookingModal(true);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  // Book a room
+  const submitBooking = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await axios.post(
+        `${endpoint}/booking/book-room`,
+        formData,
+        { withCredentials: true }
+      );
+      setFormData({ roomId: "", checkInDate: "", checkOutDate: "" });
+      setBookingModal(false);
+      toast.success(response.data.message || "Room booked successfully.");
+      setTimeout(() => navigate("/bookings"), 4000);
+      // Refresh room list to reflect updated status
+      const res = await axios.get(`${endpoint}/rooms/all-rooms`, {
+        withCredentials: true,
+      });
+      setRooms(res.data);
+    } catch (error) {
+      toast.error(
+        error.response?.data?.message || "Failed to book. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const filteredRooms = roomFilter
@@ -117,11 +179,7 @@ function TenantHome() {
                 {bookings?.[0]?.check_in_date
                   ? new Date(bookings[0].check_in_date).toLocaleDateString(
                       "en-GB",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      }
+                      { day: "numeric", month: "long", year: "numeric" }
                     )
                   : "N/A"}
               </p>
@@ -132,11 +190,7 @@ function TenantHome() {
                 {bookings?.[0]?.check_out_date
                   ? new Date(bookings[0].check_out_date).toLocaleDateString(
                       "en-GB",
-                      {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      }
+                      { day: "numeric", month: "long", year: "numeric" }
                     )
                   : "N/A"}
               </p>
@@ -193,7 +247,7 @@ function TenantHome() {
                       <strong>Status:</strong>{" "}
                       <span
                         className={
-                          myRoom.status === "AVAILABLE"
+                          myRoom.status === "Paid"
                             ? "text-green-600"
                             : "text-blue-600"
                         }
@@ -206,7 +260,7 @@ function TenantHome() {
                     className="flex items-center gap-3 animate-stagger"
                     style={{ animationDelay: "0.4s" }}
                   >
-                    <BanknoteArrowUp size={24} className="text-green-600" />
+                    <BanknoteArrowUp size={24} className="text-burgundy-600" />
                     <p>
                       <strong>Price:</strong> KES{" "}
                       {parseFloat(myRoom.price).toLocaleString()}
@@ -225,7 +279,7 @@ function TenantHome() {
 
           {/* Recent Advertisement */}
           <section
-            className="lg:w-2/5 bg-white rounded-3xl shadow-xl p-6 md:p-8 flex flex-col animate-slideUp relative min-h-[300px]"
+            className="lg:w-2/5 bg-white rounded-3xl shadow-lg p-6 md:p-8 flex flex-col animate-slideUp relative min-h-[300px]"
             style={{ animationDelay: "0.2s" }}
           >
             <h2 className="flex items-center gap-3 text-burgundy-700 text-2xl md:text-3xl font-extrabold mb-6">
@@ -251,7 +305,7 @@ function TenantHome() {
                   .map((ad, index) => (
                     <li
                       key={ad.ad_id}
-                      className="border border-burgundy-300 rounded-2xl p-5 hover:shadow-2xl hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                      className="border border-gray-300 rounded-2xl p-5 0 transition-all duration-300 cursor-pointer animate-stagger"
                       style={{ animationDelay: `${0.1 * index}s` }}
                       onClick={() => handleAdClick(ad)}
                     >
@@ -283,16 +337,16 @@ function TenantHome() {
                           <CheckCircle
                             size={16}
                             className={
-                              ad.approval_status === "APPROVED"
+                              ad.approval_status === "Approved"
                                 ? "text-green-600"
-                                : "text-red-600"
+                                : "text-blue-600"
                             }
                           />
                           <span
                             className={
-                              ad.approval_status === "APPROVED"
+                              ad.approval_status === "Approved"
                                 ? "text-green-600"
-                                : "text-red-600"
+                                : "text-blue-600"
                             }
                           >
                             {ad.approval_status}
@@ -325,7 +379,7 @@ function TenantHome() {
             <select
               value={roomFilter}
               onChange={(e) => setRoomFilter(e.target.value)}
-              className="p-2 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+              className="p-2 border border-pink-950 text-pink-950 rounded-lg  focus:ring-1 focus:ring-pink-950 focus:border-gray-300 focus:outline-none"
             >
               <option value="">All Rooms</option>
               <option value="Single">Single</option>
@@ -381,11 +435,14 @@ function TenantHome() {
                         </span>
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-green-700 font-bold">
+                    <div className="flex items-center gap-2 text-burgundy-600 font-bold">
                       <BanknoteArrowUp size={24} />
                       <span>KES {parseFloat(room.price).toLocaleString()}</span>
                     </div>
-                    <button className="w-full flex items-center justify-center gap-2 bg-burgundy-500 text-white px-4 py-3 rounded-lg hover:bg-burgundy-600 transition-colors">
+                    <button
+                      className="w-full flex items-center justify-center gap-2 bg-burgundy-500 text-white px-4 py-3 rounded-lg hover:bg-burgundy-600 transition-colors cursor-pointer"
+                      onClick={() => handleBookClick(room)}
+                    >
                       <MessageSquare size={20} /> Book Now
                     </button>
                   </div>
@@ -397,7 +454,7 @@ function TenantHome() {
 
         {/* Modal for Advertisement Details */}
         {selectedAd && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
@@ -434,9 +491,9 @@ function TenantHome() {
                   <strong>Status:</strong>{" "}
                   <span
                     className={
-                      selectedAd.approval_status === "APPROVED"
+                      selectedAd.approval_status === "Approved"
                         ? "text-green-600"
-                        : "text-red-600"
+                        : "text-blue-600"
                     }
                   >
                     {selectedAd.approval_status}
@@ -452,6 +509,87 @@ function TenantHome() {
               >
                 Contact Now
               </button>
+            </div>
+          </div>
+        )}
+
+        {/* Modal for Booking Room */}
+        {bookingModal && selectedRoom && (
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
+            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+              <button
+                className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
+                onClick={closeModal}
+              >
+                <X />
+              </button>
+              <h3 className="text-2xl font-bold text-burgundy-800 mb-4">
+                Book {selectedRoom.roomtype} Room
+              </h3>
+              <form onSubmit={submitBooking} className="space-y-4">
+                <div>
+                  <label
+                    htmlFor="checkInDate"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Check-In Date
+                  </label>
+                  <input
+                    type="date"
+                    id="checkInDate"
+                    name="checkInDate"
+                    value={formData.checkInDate}
+                    onChange={handleInputChange}
+                    min={new Date().toISOString().split("T")[0]} // Prevent past dates
+                    required
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="checkOutDate"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Check-Out Date
+                  </label>
+                  <input
+                    type="date"
+                    id="checkOutDate"
+                    name="checkOutDate"
+                    value={formData.checkOutDate}
+                    onChange={handleInputChange}
+                    min={
+                      formData.checkInDate
+                        ? new Date(
+                            new Date(formData.checkInDate).setMonth(
+                              new Date(formData.checkInDate).getMonth() + 2
+                            )
+                          )
+                            .toISOString()
+                            .split("T")[0]
+                        : ""
+                    }
+                    required
+                    className="mt-1 block w-full p-2 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full flex items-center justify-center gap-2 bg-burgundy-500 text-white px-4 py-3 rounded-lg hover:bg-burgundy-600 transition-colors cursor-pointer ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {loading ? (
+                    <Spinner size="small" />
+                  ) : (
+                    <>
+                      <MessageSquare size={20} className="cursor-pointer" />{" "}
+                      Confirm Booking
+                    </>
+                  )}
+                </button>
+              </form>
             </div>
           </div>
         )}

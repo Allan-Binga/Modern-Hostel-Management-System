@@ -46,8 +46,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/account-settings" element={<AccountSettings />} />
         <Route path="/messages" element={<Messages/>}/>
-        <Route path="/payment/success" element={<Success/>}/>
-        <Route path="/payment/failure" element={<Failure/>}/>
+        <Route path="/payments/success" element={<Success/>}/>
+        <Route path="/payments/failure" element={<Failure/>}/>
       </Routes>
 
       {/* Global ToastContainer */}

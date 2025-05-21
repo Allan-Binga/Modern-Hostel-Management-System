@@ -4,7 +4,14 @@ import Navbar from "../../components/Navbar";
 import { endpoint } from "../../backendAPI";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { Tag, Calendar, Phone, CheckCircle, MessageSquare } from "lucide-react";
+import {
+  Tag,
+  Calendar,
+  Phone,
+  CheckCircle,
+  MessageSquare,
+  X,
+} from "lucide-react";
 import Spinner from "../../components/Spinner";
 
 function Advertisements() {
@@ -156,7 +163,7 @@ function Advertisements() {
                   .map((ad, index) => (
                     <li
                       key={ad.ad_id}
-                      className="border border-burgundy-300 rounded-2xl p-5 hover:shadow-2xl hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                      className="border border-gray-300 rounded-2xl p-5 transition-all duration-300 cursor-pointer animate-stagger"
                       style={{ animationDelay: `${0.1 * index}s` }}
                       onClick={() => handleAdClick(ad)}
                     >
@@ -237,7 +244,7 @@ function Advertisements() {
                 .map((ad, index) => (
                   <li
                     key={ad.ad_id}
-                    className="border border-burgundy-300 rounded-2xl p-5 hover:shadow-2xl hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                    className="border border-gray-300 rounded-2xl p-5 hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
                     style={{ animationDelay: `${0.1 * index}s` }}
                     onClick={() => handleAdClick(ad)}
                   >
@@ -280,13 +287,13 @@ function Advertisements() {
 
         {/* Post Advertisement Modal */}
         {showModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowModal(false)}
               >
-                ✕
+                <X size={24} />
               </button>
               <h2 className="text-2xl font-bold text-burgundy-800 mb-4">
                 Post an Advertisement
@@ -308,7 +315,7 @@ function Advertisements() {
                         setFormData({ ...formData, adTitle: e.target.value })
                       }
                       placeholder="Enter ad title"
-                      className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                       required
                     />
                   </div>
@@ -325,7 +332,7 @@ function Advertisements() {
                         })
                       }
                       placeholder="Describe your ad"
-                      className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                       rows="4"
                       required
                     />
@@ -342,10 +349,12 @@ function Advertisements() {
                           productCategory: e.target.value,
                         })
                       }
-                      className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                       required
                     >
-                      <option value="">Select Category</option>
+                      <option value="" className="text-gray-700">
+                        Select Category
+                      </option>
                       {productCategories.map((cat) => (
                         <option key={cat} value={cat}>
                           {cat}
@@ -367,7 +376,7 @@ function Advertisements() {
                         })
                       }
                       placeholder="Enter duration"
-                      className="w-full p-3 border border-burgundy-300 rounded-lg focus:ring-2 focus:ring-burgundy-400"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                       min="1"
                       required
                     />
@@ -399,13 +408,13 @@ function Advertisements() {
 
         {/* Advertisement Details Modal */}
         {selectedAd && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fadeIn">
+          <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={closeModal}
               >
-                ✕
+                <X size={24} />
               </button>
               <h3 className="text-2xl font-bold text-burgundy-800 mb-4">
                 {selectedAd.ad_title}
