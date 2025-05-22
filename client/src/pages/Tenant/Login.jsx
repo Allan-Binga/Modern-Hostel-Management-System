@@ -8,6 +8,7 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { toast } from "react-toastify";
 import { endpoint } from "../../backendAPI";
+import LandingNavbar from "../../components/LandingNavbar";
 
 function TenantLogin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -65,6 +66,7 @@ function TenantLogin() {
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
+      <LandingNavbar/>
       {/* Left Section - Image */}
       <div className="lg:w-1/2 w-full h-[50vh] lg:h-screen bg-gray-900 flex items-center justify-center">
         <img

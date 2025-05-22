@@ -13,12 +13,19 @@ const signInVisitor = async (req, res) => {
   }
 
   try {
-    // Check if the room exists
+    // Check if the room exists and fetch its status
     const roomQuery = "SELECT * FROM rooms WHERE roomId = $1";
-    const room = await client.query(roomQuery, [visitedRoomId]);
+    const roomResult = await client.query(roomQuery, [visitedRoomId]);
 
-    if (room.rows.length === 0) {
+    if (roomResult.rows.length === 0) {
       return res.status(404).json({ message: "Room not found." });
+    }
+
+    const room = roomResult.rows[0];
+
+    // ❌ Reject visits to rooms that are occupied
+    if (room.status.toLowerCase() === 'Available') {
+      return res.status(403).json({ message: "Cannot visit an occupied room." });
     }
 
     // Prevent multiple active visits
@@ -49,7 +56,7 @@ const signInVisitor = async (req, res) => {
         .json({ message: "Planned exit time cannot be before entry time." });
     }
 
-    // Register visitor with planned exit time
+    // Register visitor
     const registerVisitorQuery = `
       INSERT INTO visitors (name, phoneNumber, entryTime, plannedExitTime, visitedRoomId, is_active)
       VALUES ($1, $2, $3, $4, $5, true)
@@ -73,6 +80,7 @@ const signInVisitor = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
+
 
 // Visitor Sign-Out
 const signOutVisitor = async (req, res) => {

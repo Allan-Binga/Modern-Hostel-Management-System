@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // GENERATE PDF DOCUMENTS
-const createReceipt = ({ amountPaid, apartmentNumber, paymentDate }) => {
+const createReceipt = ({ amountPaid, roomNumber, paymentDate }) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       size: "A4",
@@ -110,7 +110,7 @@ const createReceipt = ({ amountPaid, apartmentNumber, paymentDate }) => {
       .text("Month", tableLeft + 10, tableTop + rowHeight + 10)
       .text(paymentDate, tableLeft + 300, tableTop + rowHeight + 10)
       .text("Room Number", tableLeft + 10, tableTop + rowHeight * 2 + 10)
-      .text(apartmentNumber, tableLeft + 300, tableTop + rowHeight * 2 + 10)
+      .text(roomNumber, tableLeft + 300, tableTop + rowHeight * 2 + 10)
       .text("Amount", tableLeft + 10, tableTop + rowHeight * 3 + 10)
       .text(
         `KES ${amountPaid.toLocaleString()}`,
@@ -565,17 +565,18 @@ const verifyPasswordResetToken = async (req, res) => {
 };
 
 //Send Rent Payment Email
-const sendRentPaymentEmail = async (email, { roomNumber, currentMonth }) => {
+const sendRentPaymentEmail = async (email, { roomNumber, paymentDate }) => {
   const subject = "Rent Payment Confirmation";
 
   //Calculate Next Rent Date
-  const currentDate = new Date(currentMonth);
+  const currentDate = new Date(paymentDate);
   const nextPaymentDate = new Date(currentDate);
   nextPaymentDate.setDate(currentDate.getDate() + 1);
   const formattedNextPaymentDate = nextPaymentDate.toISOString().split("T")[0];
 
   //Generate PDF receipt
   const pdfBuffer = await createReceipt({
+    amountPaid,
     roomNumber,
     currentMonth,
   });
@@ -585,9 +586,9 @@ const sendRentPaymentEmail = async (email, { roomNumber, currentMonth }) => {
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
         <h2 style="color: #333;">Rent Payment Received</h2>
         <p style="color: #555;">Hi,</p>
-        <p style="color: #555;">We have received your rent payment for room <strong>${roomNumber}</strong> for the month of ${currentMonth}</strong>.</p>
+        <p style="color: #555;">We have received your rent payment for room <strong>${roomNumber}.</p>
         <p style="color: #555;">Your next rent payment is due by <strong>${formattedNextPaymentDate}</strong>.</p>
-        <p style="margin-top: 20px; color: #777;">Thank you for being a valued resident of Murandi Apartments.</p>
+        <p style="margin-top: 20px; color: #777;">Thank you.</p>
       </div>
     </div>`;
 
@@ -598,7 +599,7 @@ const sendRentPaymentEmail = async (email, { roomNumber, currentMonth }) => {
     html: message,
     attachments: [
       {
-        filename: `receipt_${currentMonth}.pdf`,
+        filename: `receipt_${paymentDate}.pdf`,
         content: pdfBuffer,
         encoding: "base64",
       },

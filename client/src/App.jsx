@@ -23,18 +23,22 @@ import Profile from "./pages/Profile/Profile";
 import AccountSettings from "./pages/AccountSettings/AccountSettings";
 import Messages from "./pages/Messages/Messages";
 import Success from "./pages/PaymentSuccess/Success";
-import Failure from "./pages/PaymentFailure/Failure"
+import Failure from "./pages/PaymentFailure/Failure";
 import PasswordChange from "./pages/PasswordReset/PasswordChange";
+import VisitorsLogin from "./pages/Visitors/Login";
+import VisitorHomes from "./pages/Visitors/Home";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/prestige-hostels" />} />
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/administrator/signup" element={<AdministratorSignup />} />
         <Route path="/administrator/login" element={<AdministratorLogin />} />
         <Route path="/administrator/home" element={<AdministratorHome />} />
+        <Route path="/visitors/login" element={<VisitorsLogin />} />
         <Route path="/prestige-hostels" element={<LandingPage />} />
+        <Route path="/visitor/home" element={<VisitorHomes/>} />
         <Route path="/home" element={<TenantHome />} />
         <Route path="/signup" element={<TenantSignup />} />
         <Route path="/login" element={<TenantLogin />} />
@@ -47,9 +51,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/account-settings" element={<AccountSettings />} />
         <Route path="/password/reset" element={<PasswordChange />} />
-        <Route path="/messages" element={<Messages/>}/>
-        <Route path="/payments/success" element={<Success/>}/>
-        <Route path="/payments/failure" element={<Failure/>}/>
+        <Route path="/messages" element={<Messages />} />
+        <Route path="/payments/success" element={<Success />} />
+        <Route path="/payments/failure" element={<Failure />} />
       </Routes>
 
       {/* Global ToastContainer */}

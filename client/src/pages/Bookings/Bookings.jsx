@@ -101,7 +101,7 @@ function Bookings() {
     .filter((b) => b.payment_status === "Unpaid")
     .reduce((sum, b) => sum + (parseFloat(b.room_price) || 0), 0)
     .toFixed(2);
-    
+
   const allPaid =
     myBookings.length > 0 &&
     myBookings.every((b) => b.payment_status === "Paid");
@@ -131,7 +131,7 @@ function Bookings() {
             <div className="space-y-4">
               <p className="text-gray-600">
                 You have{" "}
-                <span className="font-bold text-red-600">KES {totalDue}</span>{" "}
+                <span className="font-bold text-blue-600">KES {totalDue}</span>{" "}
                 due for unpaid bookings.
               </p>
 
@@ -157,7 +157,7 @@ function Bookings() {
             <button
               onClick={() => setIsModalOpen(true)}
               disabled={allPaid}
-              className={`w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 ${
+              className={`w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 cursor-pointer ${
                 allPaid ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
@@ -240,7 +240,7 @@ function Bookings() {
                           className={`font-medium ${
                             booking.payment_status === "Paid"
                               ? "text-green-600"
-                              : "text-red-600"
+                              : "text-blue-600"
                           }`}
                         >
                           {booking.payment_status}

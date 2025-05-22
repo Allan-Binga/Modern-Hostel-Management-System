@@ -61,8 +61,25 @@ app.use("/prestige-hostel/v1/users", usersRoute);
 app.use("/prestige-hostel/v1/payments", paymentRoutes);
 app.use("/prestige-hostel/v1/password", require("./routes/password"));
 
-const PORT = process.env.PORT || 5900;
+// Serve static files in production
+if (process.env.NODE_ENV === "production") {
+  const clientDistPath = path.join(__dirname, "client", "dist");
+  app.use(express.static(clientDistPath));
 
-app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-});
+  // Fallback for frontend routes
+  app.use((req, res, next) => {
+    if (req.method === "GET" && !req.path.startsWith("/murandi")) {
+      res.sendFile(path.join(clientDistPath, "index.html"));
+    } else {
+      next();
+    }
+  });
+}
+
+// Start the server only if not in test environment
+if (process.env.NODE_ENV !== "test") {
+  const PORT = process.env.PORT || 5900;
+  app.listen(PORT, () => {
+    console.log(`Server started on port ${PORT}`);
+  });
+}

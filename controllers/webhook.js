@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const client = require("../config/db");
 const Stripe = require("stripe");
 const { createNotification } = require("./notifications");
-const {sendRentPaymentEmail} = require("./emailService")
+const { sendRentPaymentEmail } = require("./emailService");
 
 dotenv.config();
 
@@ -30,7 +30,6 @@ const handleStripeWebhook = async (req, res) => {
       const tenantId = session.metadata?.tenantId;
       const roomNumber = session.metadata?.roomNumber;
       const tenantEmail = session.metadata?.tenantEmail;
-      const currentMonth = session.metadata?.currentMonth;
       const tenantName = session.metadata?.tenantName;
 
       try {
@@ -75,9 +74,16 @@ const handleStripeWebhook = async (req, res) => {
         // console.log(`Room ${roomId} status set to Occupied.`);
         await createNotification(
           tenantId,
-          `Hi ${tenantName}, thank you, we have received your rent for the month of ${currentMonth}.`
+          `Hi ${tenantName}, thank you, we have received your rent.`
         );
-        await sendRentPaymentEmail(roomNumber, currentMonth)
+        // Get the current date for payment date
+        const paymentDate = new Date().toISOString().split("T")[0];
+
+        await sendRentPaymentEmail(tenantEmail, {
+          amountPaid: session.amount_total / 100,
+          roomNumber: roomNumber,
+          paymentDate,
+        });
         return res.status(200).send("Webhook received and processed.");
       } catch (error) {
         console.error("Error processing webhook:", error.message);
