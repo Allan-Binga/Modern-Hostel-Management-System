@@ -24,6 +24,7 @@ import AccountSettings from "./pages/AccountSettings/AccountSettings";
 import Messages from "./pages/Messages/Messages";
 import Success from "./pages/PaymentSuccess/Success";
 import Failure from "./pages/PaymentFailure/Failure"
+import PasswordChange from "./pages/PasswordReset/PasswordChange";
 
 function App() {
   return (
@@ -45,6 +46,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/account-settings" element={<AccountSettings />} />
+        <Route path="/password/reset" element={<PasswordChange />} />
         <Route path="/messages" element={<Messages/>}/>
         <Route path="/payments/success" element={<Success/>}/>
         <Route path="/payments/failure" element={<Failure/>}/>

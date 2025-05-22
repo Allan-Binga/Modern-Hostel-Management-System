@@ -101,12 +101,12 @@ const updateInformation = async (req, res) => {
     let counter = 1;
 
     if (firstName) {
-      fields.push(`firstName = $${counter++}`);
+      fields.push(`firstname = $${counter++}`);
       values.push(firstName);
     }
 
     if (lastName) {
-      fields.push(`lastName = $${counter++}`);
+      fields.push(`lastname = $${counter++}`);
       values.push(lastName);
     }
 
@@ -116,7 +116,7 @@ const updateInformation = async (req, res) => {
     }
 
     if (phone) {
-      fields.push(`phone = $${counter++}`);
+      fields.push(`phonenumber = $${counter++}`);
       values.push(phone);
     }
 

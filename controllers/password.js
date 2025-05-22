@@ -2,7 +2,7 @@ const client = require("../config/db");
 const crypto = require("crypto");
 const bcrypt = require("bcrypt");
 const { sendPasswordResetEmail } = require("./emailService");
-const {createNotification} = require("./notifications")
+const { createNotification } = require("./notifications");
 
 //Reset Password
 const resetPasswordEmail = async (req, res) => {

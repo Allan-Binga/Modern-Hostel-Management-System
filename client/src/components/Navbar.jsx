@@ -144,15 +144,6 @@ function Navbar() {
             <ul className="absolute top-full mt-2 w-44 bg-white text-gray-900 rounded-lg shadow-lg border border-gray-200 z-50">
               <li>
                 <a
-                  href="/profile"
-                  className="flex items-center px-5 py-3 hover:bg-gray-100 transition cursor-pointer"
-                >
-                  <User className="w-5 h-5 mr-2 text-gray-600" />
-                  Profile
-                </a>
-              </li>
-              <li>
-                <a
                   href="/account-settings"
                   className="flex items-center px-5 py-3 hover:bg-gray-100 transition cursor-pointer"
                 >
@@ -160,7 +151,7 @@ function Navbar() {
                   Account Settings
                 </a>
               </li>
-              {/* Uncomment if you want Logout in dropdown
+              {/* Uncomment if you want Logout in dropdown */}
               <li>
                 <button
                   onClick={handleLogout}
@@ -169,7 +160,7 @@ function Navbar() {
                   <LogOutIcon className="w-5 h-5 mr-2" />
                   Logout
                 </button>
-              </li> */}
+              </li>
             </ul>
           )}
         </li>

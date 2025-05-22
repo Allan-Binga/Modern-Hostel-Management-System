@@ -142,6 +142,7 @@ function TenantHome() {
       toast.error(
         error.response?.data?.message || "Failed to book. Please try again."
       );
+      setBookingModal(false)
     } finally {
       setLoading(false);
     }
@@ -244,7 +245,6 @@ function TenantHome() {
                   >
                     <Clock size={24} className="text-burgundy-600" />
                     <p>
-                      <strong>Status:</strong>{" "}
                       <span
                         className={
                           myRoom.status === "Paid"
@@ -423,10 +423,9 @@ function TenantHome() {
                     <div className="flex items-center gap-2">
                       <Clock size={24} className="text-burgundy-600" />
                       <span>
-                        Status:{" "}
                         <span
                           className={
-                            room.status === "AVAILABLE"
+                            room.status === "Available"
                               ? "text-green-600"
                               : "text-blue-700"
                           }

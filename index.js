@@ -59,6 +59,7 @@ app.use("/prestige-hostel/v1/checkout", checkoutRoute);
 app.use("/prestige-hostel/v1/notifications", notificationRoute);
 app.use("/prestige-hostel/v1/users", usersRoute);
 app.use("/prestige-hostel/v1/payments", paymentRoutes);
+app.use("/prestige-hostel/v1/password", require("./routes/password"));
 
 const PORT = process.env.PORT || 5900;
 

@@ -36,7 +36,7 @@ const handleStripeWebhook = async (req, res) => {
           throw new Error("Room Number not found in session's metadata.");
         }
 
-        //Fetch tenant details
+        // Fetch tenant details
         const tenantQuery = `SELECT firstname, lastname, email FROM tenants WHERE id = $1`;
         const tenantResult = await client.query(tenantQuery, [tenantId]);
 
@@ -44,34 +44,31 @@ const handleStripeWebhook = async (req, res) => {
           throw new Error("Tenant not found.");
         }
 
-        //Fetch tenant's room id
+        // Fetch tenant's room_id from bookings
         const roomIdQuery = `SELECT room_id FROM bookings WHERE tenant_id = $1`;
         const roomResult = await client.query(roomIdQuery, [tenantId]);
 
         if (roomResult.rows.length === 0) {
-          throw new Error("Room not found.");
+          throw new Error("Room not found for tenant.");
         }
 
-        //Update Payment Status
+        const roomId = roomResult.rows[0].room_id;
+
+        // Update Payment Status
         const updateQuery = `UPDATE payments SET payment_status = $1 WHERE payment_id = $2`;
         await client.query(updateQuery, ["Paid", paymentId]);
         console.log(`Payment ${paymentId} marked as paid.`);
 
-        //Update Booking payment Status:
+        // Update Booking Payment Status
         const updateBookingQuery = `UPDATE bookings SET payment_status = $1 WHERE tenant_id = $2`;
         await client.query(updateBookingQuery, ["Paid", tenantId]);
         console.log(`Booking for tenant ${tenantId} marked as paid.`);
 
-        const {
-          firstname,
-          lastname,
-          roomNumber: fetchedRoomNumber,
-          email: tenantEmail,
-        } = tenantResult.rows[0];
-        const fullName = `${firstname} ${lastname}`;
+        // ✅ NEW: Update room status to 'Occupied'
+        const updateRoomStatusQuery = `UPDATE rooms SET status = $1 WHERE roomid = $2`;
+        await client.query(updateRoomStatusQuery, ["Occupied", roomId]);
+        console.log(`Room ${roomId} status set to Occupied.`);
 
-        // Get the current date for payment date
-        const paymentDate = new Date().toISOString().split("T")[0];
         return res.status(200).send("Webhook received and processed.");
       } catch (error) {
         console.error("Error processing webhook:", error.message);

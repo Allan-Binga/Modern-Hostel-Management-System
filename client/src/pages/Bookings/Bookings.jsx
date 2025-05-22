@@ -97,10 +97,10 @@ function Bookings() {
     ? myBookings.filter((booking) => booking.payment_status === filter)
     : myBookings;
 
-  // Mock total amount due (replace with real calculation from backend)
-  const totalDue = filteredBookings
-    .filter((booking) => booking.payment_status === "Unpaid")
-    .reduce((sum, booking) => sum + (booking.amount || 15000), 0);
+  const totalDue = myBookings
+    .filter((b) => b.payment_status === "Unpaid")
+    .reduce((sum, b) => sum + (parseFloat(b.room_price) || 0), 0)
+    .toFixed(2);
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-burgundy-100 to-burgundy-200 animate-fadeIn">
@@ -121,15 +121,14 @@ function Bookings() {
           <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
             <BanknoteArrowUp size={28} /> Pay Rent
           </h2>
-          {totalDue > 0 ? (
+          {parseFloat(totalDue) > 0 ? (
             <div className="space-y-4">
               <p className="text-gray-600">
                 You have{" "}
-                <span className="font-bold text-red-600">
-                  KES {totalDue.toLocaleString()}
-                </span>{" "}
+                <span className="font-bold text-red-600">KES {totalDue}</span>{" "}
                 due for unpaid bookings.
               </p>
+
               <button
                 onClick={() => setIsModalOpen(true)}
                 // disabled={paymentLoading}
