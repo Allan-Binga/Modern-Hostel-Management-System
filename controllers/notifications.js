@@ -77,9 +77,45 @@ const readNotifications = async (req, res) => {
   }
 };
 
+//Read All At Once
+const readAllNotifications = async (req, res) => {
+  const tenantId = req.tenantId;
+
+  if (!tenantId) {
+    return res
+      .status(401)
+      .json({ message: "Unauthorized. No tenantID provided." });
+  }
+
+  try {
+    const result = await client.query(
+      `UPDATE notifications 
+         SET status = 'read' 
+         WHERE tenant_id = $1 AND status != 'read'
+         RETURNING *`,
+      [tenantId]
+    );
+
+    if (result.rowCount === 0) {
+      return res
+        .status(404)
+        .json({ message: "No unread notifications found." });
+    }
+
+    res.status(200).json({
+      message: `${result.rowCount} notification(s) marked as read.`,
+      notifications: result.rows,
+    });
+  } catch (error) {
+    console.error("Error updating notifications:", error);
+    res.status(500).json({ message: "Could not read notifications." });
+  }
+};
+
 module.exports = {
   getNotifications,
   createNotification,
   getMyNotifications,
   readNotifications,
+  readAllNotifications,
 };

@@ -4,6 +4,7 @@ const moment = require("moment");
 const dotenv = require("dotenv");
 const Stripe = require("stripe");
 const { sendPaymentFailureEmail } = require("./emailService");
+const { createNotification } = require("./notifications");
 
 dotenv.config();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -13,7 +14,7 @@ const createStripeCheckoutSession = async (req, res) => {
   const tenantId = req.tenantId;
 
   try {
-    //Find tenant room number
+    // Find tenant room number
     const tenantQuery = `SELECT room_id FROM bookings WHERE tenant_id = $1`;
     const tenantResult = await client.query(tenantQuery, [tenantId]);
 
@@ -21,18 +22,20 @@ const createStripeCheckoutSession = async (req, res) => {
       return res.status(404).json({ error: "Tenant not found." });
     }
 
-    //Find Tenant's Email
-    const emailQuery = `SELECT email FROM tenants WHERE id = $1`;
+    // Find tenant email and full name
+    const emailQuery = `SELECT email, firstname, lastname FROM tenants WHERE id = $1`;
     const emailResult = await client.query(emailQuery, [tenantId]);
 
     if (emailResult.rows.length === 0) {
-      return res.status(404).json({ error: "Email not found." });
+      return res.status(404).json({ error: "Tenant email not found." });
     }
 
-    const roomNumber = tenantResult.rows[0].room_id;
-    const tenantEmail = emailResult.rows[0].email;
+    const { email: tenantEmail, firstname, lastname } = emailResult.rows[0];
+    const tenantName = `${firstname} ${lastname}`;
 
-    //Get Rent Amount from Rooms Listings
+    const roomNumber = tenantResult.rows[0].room_id;
+
+    // Get rent amount and room image
     const rentQuery = `SELECT price, image FROM rooms WHERE roomid = $1`;
     const rentResult = await client.query(rentQuery, [roomNumber]);
 
@@ -42,13 +45,12 @@ const createStripeCheckoutSession = async (req, res) => {
 
     const { price: rentAmount, image: roomImage } = rentResult.rows[0];
 
-    //Current Date
+    // Check for recent payment
     const today = new Date().toISOString().split("T")[0];
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
     const thirtyDaysAgoString = thirtyDaysAgo.toISOString().split("T")[0];
 
-    //Check if any payment was made in the previous 30 days
     const paymentCheckQuery = `
       SELECT * FROM payments
       WHERE tenant_id = $1
@@ -68,13 +70,18 @@ const createStripeCheckoutSession = async (req, res) => {
       });
     }
 
+    // Insert new payment
     const insertPaymentQuery = `INSERT INTO payments (tenant_id, amount, payment_date, payment_method, payment_status) VALUES ($1, $2, $3, $4, $5) RETURNING payment_id`;
-
     const values = [tenantId, rentAmount, today, "Stripe", "Pending"];
     const result = await client.query(insertPaymentQuery, values);
     const paymentId = result.rows[0].payment_id;
 
-    //Stripe Session
+    // Get current month
+    const currentMonth = new Date().toLocaleString("default", {
+      month: "long",
+    });
+
+    // Create Stripe session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [
@@ -82,7 +89,7 @@ const createStripeCheckoutSession = async (req, res) => {
           price_data: {
             currency: "kes",
             product_data: {
-              name: `Rent payment for <TenantName> for the month of <Month>`,
+              name: `Rent payment for ${tenantName} - Room ${roomNumber} for the month of ${currentMonth}.`,
               images: roomImage ? [roomImage] : [],
             },
             unit_amount: rentAmount * 100,
@@ -96,13 +103,19 @@ const createStripeCheckoutSession = async (req, res) => {
       metadata: {
         paymentId: paymentId.toString(),
         tenantId: tenantId.toString(),
+        tenantName,
+        tenantEmail,
         roomNumber: roomNumber.toString(),
+        currentMonth,
       },
       payment_intent_data: {
         metadata: {
           paymentId: paymentId.toString(),
           tenantId: tenantId.toString(),
+          tenantName,
+          tenantEmail,
           roomNumber: roomNumber.toString(),
+          currentMonth,
         },
       },
     });
@@ -113,8 +126,7 @@ const createStripeCheckoutSession = async (req, res) => {
     res
       .status(500)
       .json({ error: "Failed to create checkout session.", error });
-
-    // await sendPaymentFailureEmail(tenantEmail)
+    // Optional: await sendPaymentFailureEmail(tenantEmail);
   }
 };
 

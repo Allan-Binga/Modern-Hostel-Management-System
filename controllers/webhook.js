@@ -2,6 +2,7 @@ const axios = require("axios");
 const dotenv = require("dotenv");
 const client = require("../config/db");
 const Stripe = require("stripe");
+const { createNotification } = require("./notifications");
 
 dotenv.config();
 
@@ -27,6 +28,9 @@ const handleStripeWebhook = async (req, res) => {
       const paymentId = session.metadata?.paymentId;
       const tenantId = session.metadata?.tenantId;
       const roomNumber = session.metadata?.roomNumber;
+      const tenantEmail = session.metadata?.tenantEmail;
+      const currentMonth = session.metadata?.currentMonth;
+      const tenantName = session.metadata?.tenantName;
 
       try {
         if (!paymentId) {
@@ -70,6 +74,10 @@ const handleStripeWebhook = async (req, res) => {
         console.log(`Room ${roomId} status set to Occupied.`);
 
         return res.status(200).send("Webhook received and processed.");
+        await createNotification(
+          tenantId,
+          `Hi ${tenantName}, thank you, we have received your rent for the month of ${currentMonth}.`
+        );
       } catch (error) {
         console.error("Error processing webhook:", error.message);
         return res.status(500).send("Internal server error.");
