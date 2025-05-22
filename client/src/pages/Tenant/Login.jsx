@@ -164,14 +164,14 @@ function TenantLogin() {
           </p>
 
           {/* Divider */}
-          <div className="flex items-center justify-center space-x-2">
+          {/* <div className="flex items-center justify-center space-x-2">
             <hr className="w-1/4 border-gray-300" />
             <span className="text-md text-gray-500">Or</span>
             <hr className="w-1/4 border-gray-300" />
-          </div>
+          </div> */}
 
           {/* Administrator Signup */}
-          <p className="text-center text-md text-gray-600">
+          {/* <p className="text-center text-md text-gray-600">
             Are you an administrator?{" "}
             <Link
               to="/administrator/login"
@@ -179,7 +179,7 @@ function TenantLogin() {
             >
               Click Here
             </Link>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>
