@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // GENERATE PDF DOCUMENTS
-const createReceipt = ({ amountPaid, roomNumber, paymentDate }) => {
+const createReceipt = ({  roomNumber, paymentDate }) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       size: "A4",
@@ -111,12 +111,12 @@ const createReceipt = ({ amountPaid, roomNumber, paymentDate }) => {
       .text(paymentDate, tableLeft + 300, tableTop + rowHeight + 10)
       .text("Room Number", tableLeft + 10, tableTop + rowHeight * 2 + 10)
       .text(roomNumber, tableLeft + 300, tableTop + rowHeight * 2 + 10)
-      .text("Amount", tableLeft + 10, tableTop + rowHeight * 3 + 10)
-      .text(
-        `KES ${amountPaid.toLocaleString()}`,
-        tableLeft + 300,
-        tableTop + rowHeight * 3 + 10
-      );
+      // .text("Amount", tableLeft + 10, tableTop + rowHeight * 3 + 10)
+      // .text(
+      //   `KES ${amountPaid.toLocaleString()}`,
+      //   tableLeft + 300,
+      //   tableTop + rowHeight * 3 + 10
+      // );
 
     doc.rect(tableLeft, tableTop, tableWidth, rowHeight * 4).stroke("#dddddd");
 
@@ -576,9 +576,9 @@ const sendRentPaymentEmail = async (email, { roomNumber, paymentDate }) => {
 
   //Generate PDF receipt
   const pdfBuffer = await createReceipt({
-    amountPaid,
+    // amountPaid,
     roomNumber,
-    currentMonth,
+    // currentMonth,
   });
 
   const message = `

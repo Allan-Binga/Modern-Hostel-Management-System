@@ -80,7 +80,7 @@ const handleStripeWebhook = async (req, res) => {
         const paymentDate = new Date().toISOString().split("T")[0];
 
         await sendRentPaymentEmail(tenantEmail, {
-          amountPaid: session.amount_total / 100,
+          // amountPaid: session.amount_total / 100,
           roomNumber: roomNumber,
           paymentDate,
         });
