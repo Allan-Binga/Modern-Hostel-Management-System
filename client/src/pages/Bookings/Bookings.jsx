@@ -101,6 +101,10 @@ function Bookings() {
     .filter((b) => b.payment_status === "Unpaid")
     .reduce((sum, b) => sum + (parseFloat(b.room_price) || 0), 0)
     .toFixed(2);
+    
+  const allPaid =
+    myBookings.length > 0 &&
+    myBookings.every((b) => b.payment_status === "Paid");
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-burgundy-100 to-burgundy-200 animate-fadeIn">
@@ -117,10 +121,12 @@ function Bookings() {
         </header>
 
         {/* Pay Rent Section */}
+        {/* Pay Rent Section */}
         <section className="mb-12 bg-white rounded-3xl shadow-xl p-8 animate-slideUp">
           <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
             <BanknoteArrowUp size={28} /> Pay Rent
           </h2>
+
           {parseFloat(totalDue) > 0 ? (
             <div className="space-y-4">
               <p className="text-gray-600">
@@ -131,9 +137,11 @@ function Bookings() {
 
               <button
                 onClick={() => setIsModalOpen(true)}
-                // disabled={paymentLoading}
+                disabled={paymentLoading || allPaid}
                 className={`w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 ${
-                  paymentLoading ? "opacity-50 cursor-not-allowed" : ""
+                  paymentLoading || allPaid
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
                 }`}
               >
                 {paymentLoading ? (
@@ -146,9 +154,17 @@ function Bookings() {
               </button>
             </div>
           ) : (
-            <p className="text-gray-600 italic">
-              No payments due at the moment.
-            </p>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              disabled={allPaid}
+              className={`w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 ${
+                allPaid ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              <>
+                <CreditCard size={20} /> Pay Rent Now
+              </>
+            </button>
           )}
         </section>
 

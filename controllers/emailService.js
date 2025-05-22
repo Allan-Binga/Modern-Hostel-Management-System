@@ -17,6 +17,139 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// GENERATE PDF DOCUMENTS
+const createReceipt = ({ amountPaid, apartmentNumber, paymentDate }) => {
+  return new Promise((resolve, reject) => {
+    const doc = new PDFDocument({
+      size: "A4",
+      margin: 50,
+    });
+
+    const buffers = [];
+    doc.on("data", buffers.push.bind(buffers));
+    doc.on("end", () => {
+      const pdfData = Buffer.concat(buffers);
+      resolve(pdfData);
+    });
+    doc.on("error", reject);
+
+    const logoPath = path.join(__dirname, "../assets/prestigeLogo.png");
+    if (fs.existsSync(logoPath)) {
+      doc.image(logoPath, 50, 30, { width: 80 });
+    }
+
+    // Adjusted values to center text relative to remaining space after logo
+    const contentWidth = 595.28 - 2 * 50; // A4 page width minus margins
+    const headerX = 150;
+    const headerWidth = contentWidth - 100;
+
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(20)
+      .fillColor("#003087")
+      .text("Prestige Girls Hostel", headerX, 30, {
+        width: headerWidth,
+        align: "center",
+      });
+
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .fillColor("#333333")
+      .text("Ongata Rongai, Kajiado", headerX, 55, {
+        width: headerWidth,
+        align: "center",
+      });
+
+    doc.text(
+      "Phone: +254 757942602 | Email: prestigehostel8@gmail.com",
+      headerX,
+      70,
+      {
+        width: headerWidth,
+        align: "center",
+      }
+    );
+
+    // Title
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(16)
+      .fillColor("#003087")
+      .text("Your receipt for", 0, 120, { align: "center" });
+
+    doc.moveDown(2);
+
+    // Table-like section
+    const tableTop = 160;
+    const tableLeft = 50;
+    const tableWidth = 500;
+    const rowHeight = 30;
+
+    doc
+      .rect(tableLeft, tableTop, tableWidth, rowHeight)
+      .fill("#f5f5f5")
+      .stroke("#dddddd");
+
+    doc
+      .font("Helvetica-Bold")
+      .fontSize(12)
+      .fillColor("#333333")
+      .text("Description", tableLeft + 10, tableTop + 10)
+      .text("Details", tableLeft + 300, tableTop + 10);
+
+    doc
+      .rect(tableLeft, tableTop + rowHeight, tableWidth, rowHeight * 3)
+      .fill("#ffffff")
+      .stroke("#dddddd");
+
+    doc
+      .font("Helvetica")
+      .fontSize(11)
+      .fillColor("#333333")
+      .text("Month", tableLeft + 10, tableTop + rowHeight + 10)
+      .text(paymentDate, tableLeft + 300, tableTop + rowHeight + 10)
+      .text("Room Number", tableLeft + 10, tableTop + rowHeight * 2 + 10)
+      .text(apartmentNumber, tableLeft + 300, tableTop + rowHeight * 2 + 10)
+      .text("Amount", tableLeft + 10, tableTop + rowHeight * 3 + 10)
+      .text(
+        `KES ${amountPaid.toLocaleString()}`,
+        tableLeft + 300,
+        tableTop + rowHeight * 3 + 10
+      );
+
+    doc.rect(tableLeft, tableTop, tableWidth, rowHeight * 4).stroke("#dddddd");
+
+    doc
+      .font("Helvetica")
+      .fontSize(12)
+      .fillColor("#333333")
+      .text(
+        "Thank you for trusting Prestige Hostels.",
+        0,
+        tableTop + rowHeight * 5,
+        { align: "center" }
+      );
+
+    const footerY = doc.page.height - 80;
+    doc
+      .font("Helvetica")
+      .fontSize(9)
+      .fillColor("#666666")
+      .text("Prestige Girls Hostel", 0, footerY, {
+        align: "center",
+      });
+    doc.text(
+      "For inquiries, contact us at prestigehostel8@gmail.com",
+      0,
+      footerY + 15,
+      { align: "center" }
+    );
+
+    doc.end();
+  });
+};
+
 //Send Verification Email
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.CLIENT_URL}/account-verification?token=${token}`;
@@ -431,6 +564,59 @@ const verifyPasswordResetToken = async (req, res) => {
   }
 };
 
+//Send Rent Payment Email
+const sendRentPaymentEmail = async (email, { roomNumber, currentMonth }) => {
+  const subject = "Rent Payment Confirmation";
+
+  //Calculate Next Rent Date
+  const currentDate = new Date(currentMonth);
+  const nextPaymentDate = new Date(currentDate);
+  nextPaymentDate.setDate(currentDate.getDate() + 1);
+  const formattedNextPaymentDate = nextPaymentDate.toISOString().split("T")[0];
+
+  //Generate PDF receipt
+  const pdfBuffer = await createReceipt({
+    roomNumber,
+    currentMonth,
+  });
+
+  const message = `
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #333;">Rent Payment Received</h2>
+        <p style="color: #555;">Hi,</p>
+        <p style="color: #555;">We have received your rent payment for room <strong>${roomNumber}</strong> for the month of ${currentMonth}</strong>.</p>
+        <p style="color: #555;">Your next rent payment is due by <strong>${formattedNextPaymentDate}</strong>.</p>
+        <p style="margin-top: 20px; color: #777;">Thank you for being a valued resident of Murandi Apartments.</p>
+      </div>
+    </div>`;
+
+  const mailOptions = {
+    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
+    to: email,
+    subject: subject,
+    html: message,
+    attachments: [
+      {
+        filename: `receipt_${currentMonth}.pdf`,
+        content: pdfBuffer,
+        encoding: "base64",
+      },
+      {
+        filename: "prestigeLogo.png",
+        path: "./assets/prestigeLogo.png",
+        cid: "logo",
+      },
+    ],
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+  } catch (error) {
+    throw error;
+  }
+};
+
 module.exports = {
   sendVerificationEmail,
   verifyToken,
@@ -442,4 +628,5 @@ module.exports = {
   verifyPasswordResetToken,
   technicianAssignmentEmail,
   sendIssueSubmissionEmailAdmin,
+  sendRentPaymentEmail,
 };

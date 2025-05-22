@@ -3,7 +3,6 @@ const axios = require("axios");
 const moment = require("moment");
 const dotenv = require("dotenv");
 const Stripe = require("stripe");
-const { sendPaymentFailureEmail } = require("./emailService");
 const { createNotification } = require("./notifications");
 
 dotenv.config();
@@ -123,10 +122,13 @@ const createStripeCheckoutSession = async (req, res) => {
     res.status(200).json({ id: session.id, url: session.url });
   } catch (error) {
     console.error("Error creating rent checkout session:", error.message);
+    await createNotification(
+      tenantId,
+      "Your rent payment attempt failed. Please try again."
+    );
     res
       .status(500)
       .json({ error: "Failed to create checkout session.", error });
-    // Optional: await sendPaymentFailureEmail(tenantEmail);
   }
 };
 

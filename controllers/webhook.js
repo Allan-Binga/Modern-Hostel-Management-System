@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const client = require("../config/db");
 const Stripe = require("stripe");
 const { createNotification } = require("./notifications");
+const {sendRentPaymentEmail} = require("./emailService")
 
 dotenv.config();
 
@@ -61,23 +62,23 @@ const handleStripeWebhook = async (req, res) => {
         // Update Payment Status
         const updateQuery = `UPDATE payments SET payment_status = $1 WHERE payment_id = $2`;
         await client.query(updateQuery, ["Paid", paymentId]);
-        console.log(`Payment ${paymentId} marked as paid.`);
+        // console.log(`Payment ${paymentId} marked as paid.`);
 
         // Update Booking Payment Status
         const updateBookingQuery = `UPDATE bookings SET payment_status = $1 WHERE tenant_id = $2`;
         await client.query(updateBookingQuery, ["Paid", tenantId]);
-        console.log(`Booking for tenant ${tenantId} marked as paid.`);
+        // console.log(`Booking for tenant ${tenantId} marked as paid.`);
 
-        // ✅ NEW: Update room status to 'Occupied'
+        //Update room status to 'Occupied'
         const updateRoomStatusQuery = `UPDATE rooms SET status = $1 WHERE roomid = $2`;
         await client.query(updateRoomStatusQuery, ["Occupied", roomId]);
-        console.log(`Room ${roomId} status set to Occupied.`);
-
-        return res.status(200).send("Webhook received and processed.");
+        // console.log(`Room ${roomId} status set to Occupied.`);
         await createNotification(
           tenantId,
           `Hi ${tenantName}, thank you, we have received your rent for the month of ${currentMonth}.`
         );
+        await sendRentPaymentEmail(roomNumber, currentMonth)
+        return res.status(200).send("Webhook received and processed.");
       } catch (error) {
         console.error("Error processing webhook:", error.message);
         return res.status(500).send("Internal server error.");
@@ -91,7 +92,7 @@ const handleStripeWebhook = async (req, res) => {
         if (failedPaymentId) {
           const updateQuery = `UPDATE payments SET payment_status = $1 WHERE payment_id = $2`;
           await client.query(updateQuery, ["Failed", failedPaymentId]);
-          console.log(`Payment ${failedPaymentId} marked as failed`);
+          // console.log(`Payment ${failedPaymentId} marked as failed`);
         }
         return res.status(200).send("Webhook received and processed.");
       } catch (error) {
@@ -100,7 +101,7 @@ const handleStripeWebhook = async (req, res) => {
       }
 
     default:
-      console.log(`Unhandled event type: ${event.type}`);
+      // console.log(`Unhandled event type: ${event.type}`);
       return res.status(200).send("Webhook received.");
   }
 };

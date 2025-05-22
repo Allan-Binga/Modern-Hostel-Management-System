@@ -51,7 +51,7 @@ function Success() {
     return () => clearTimeout(timer);
   }, []);
 
-  const latestPayment = payments[0]; // Just pick the most recent one
+  const latestPayment = payments[0]; 
 
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-burgundy-100 to-burgundy-200 animate-fadeIn">

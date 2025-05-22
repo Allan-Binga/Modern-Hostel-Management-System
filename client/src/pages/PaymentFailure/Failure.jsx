@@ -10,15 +10,38 @@ import { endpoint } from "../../backendAPI";
 function Failure() {
   const [loading, setLoading] = useState(false);
   const [iconAnimated, setIconAnimated] = useState(false);
+  const [payments, setPayments] = useState([]);
+
+  const recentPayments = async () => {
+    try {
+      const response = await axios.get(`${endpoint}/payments/my-payments`, {
+        withCredentials: true,
+      });
+      return response.data;
+    } catch (error) {
+      throw error.response?.data?.message || "Failed to fetch payments";
+    }
+  };
+
+  useEffect(() => {
+    const fetchPayouts = async () => {
+      setLoading(true);
+      try {
+        const data = await recentPayments();
+        setPayments(data);
+      } catch (error) {
+        console.error("Error fetching payments:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPayouts();
+  }, []);
+
+  const latestPayment = payments[0];
 
   // Mock tenant and error data (replace with real data from backend/context)
   const tenantName = localStorage.getItem("tenantName") || "Tenant";
-  const errorDetails = {
-    amount: "KES 15,000",
-    date: new Date().toLocaleString(),
-    reason: "Insufficient funds or invalid card details",
-    attemptId: "ATT123456789",
-  };
 
   useEffect(() => {
     // Trigger toast on page load
@@ -66,7 +89,7 @@ function Failure() {
               Payment Failed
             </h1>
             <p className="text-lg text-gray-600 mt-2">
-              Sorry, {tenantName}. Your payment could not be processed.
+              Sorry. Your payment could not be processed.
             </p>
           </div>
 
@@ -78,19 +101,17 @@ function Failure() {
             <div className="space-y-3 text-gray-600">
               <div className="flex justify-between">
                 <span className="font-medium">Amount Attempted:</span>
-                <span>{errorDetails.amount}</span>
+                <span>KES {parseFloat(latestPayment.amount).toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Date:</span>
-                <span>{errorDetails.date}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-medium">Reason:</span>
-                <span>{errorDetails.reason}</span>
+                <span>
+                  {new Date(latestPayment.payment_date).toLocaleDateString()}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Attempt ID:</span>
-                <span>{errorDetails.attemptId}</span>
+                <span>{latestPayment.transaction_id || "N/A"}</span>
               </div>
             </div>
           </section>

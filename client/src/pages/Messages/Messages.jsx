@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import { endpoint } from "../../backendAPI";
 
-
 function Messages() {
   const [notifications, setNotifications] = useState([]);
   const [filteredNotifications, setFilteredNotifications] = useState([]);
@@ -33,12 +32,14 @@ function Messages() {
     const fetchNotifications = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${endpoint}/notifications/my-notifications`, {
-          withCredentials: true,
-        });
+        const res = await axios.get(
+          `${endpoint}/notifications/my-notifications`,
+          {
+            withCredentials: true,
+          }
+        );
         setNotifications(res.data || []);
         setFilteredNotifications(res.data || []);
-        toast.success("Notifications loaded successfully!");
       } catch (err) {
         toast.error("Failed to fetch notifications.");
         console.error("Failed to fetch notifications:", err);
@@ -99,7 +100,7 @@ function Messages() {
     setLoading(true);
     try {
       await axios.put(
-        `${endpoint}/notifications/my-notifications/mark-all-as-read`,
+        `${endpoint}/notifications/my-notifications/read-all`,
         {},
         { withCredentials: true }
       );
@@ -180,7 +181,10 @@ function Messages() {
               </h2>
               <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
                 <div className="relative">
-                  <Filter size={20} className="absolute left-3 top-2.5 text-burgundy-500" />
+                  <Filter
+                    size={20}
+                    className="absolute left-3 top-2.5 text-burgundy-500"
+                  />
                   <select
                     value={filterStatus}
                     onChange={(e) => setFilterStatus(e.target.value)}
@@ -193,7 +197,10 @@ function Messages() {
                   </select>
                 </div>
                 <div className="relative">
-                  <SortAsc size={20} className="absolute left-3 top-2.5 text-burgundy-500" />
+                  <SortAsc
+                    size={20}
+                    className="absolute left-3 top-2.5 text-burgundy-500"
+                  />
                   <select
                     value={sortOrder}
                     onChange={(e) => setSortOrder(e.target.value)}
@@ -207,9 +214,13 @@ function Messages() {
                 </div>
                 <button
                   onClick={markAllAsRead}
-                  disabled={loading || notifications.every((note) => note.status === "read")}
+                  disabled={
+                    loading ||
+                    notifications.every((note) => note.status === "read")
+                  }
                   className={`flex items-center gap-2 px-4 py-2 bg-burgundy-500 text-white rounded-lg hover:bg-burgundy-600 transition-colors text-sm ${
-                    loading || notifications.every((note) => note.status === "read")
+                    loading ||
+                    notifications.every((note) => note.status === "read")
                       ? "opacity-50 cursor-not-allowed"
                       : ""
                   }`}
@@ -221,7 +232,10 @@ function Messages() {
 
             {filteredNotifications.length === 0 ? (
               <div className="text-center py-12">
-                <MessageCircle size={48} className="text-burgundy-300 mx-auto mb-4" />
+                <MessageCircle
+                  size={48}
+                  className="text-burgundy-300 mx-auto mb-4"
+                />
                 <p className="text-gray-600 text-base">
                   No notifications to display. You're all caught up!
                 </p>
@@ -243,7 +257,9 @@ function Messages() {
                     aria-label={`Notification: ${note.message}`}
                   >
                     <div className="flex-1">
-                      <p className="text-base text-burgundy-800">{note.message}</p>
+                      <p className="text-base text-burgundy-800">
+                        {note.message}
+                      </p>
                       <div className="flex items-center text-sm text-gray-500 mt-2 gap-2">
                         <Clock4 size={16} />
                         {formatDate(note.notification_date)}
