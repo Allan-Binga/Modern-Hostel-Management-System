@@ -33,7 +33,7 @@ const signInVisitor = async (req, res) => {
     // Prevent multiple active visits
     const activeVisitQuery = `
       SELECT * FROM visitors 
-      WHERE phoneNumber = $1 AND visitedRoomId = $2 AND is_active = true
+      WHERE phonenumber = $1 AND visitedroomid = $2 AND is_active = true
     `;
     const activeVisit = await client.query(activeVisitQuery, [
       phoneNumber,
