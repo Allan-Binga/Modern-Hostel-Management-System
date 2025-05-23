@@ -142,7 +142,6 @@ function TenantHome() {
       toast.error(
         error.response?.data?.message || "Failed to book. Please try again."
       );
-      setBookingModal(false)
     } finally {
       setLoading(false);
     }

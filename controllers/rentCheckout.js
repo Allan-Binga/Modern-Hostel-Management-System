@@ -115,6 +115,7 @@ const createStripeCheckoutSession = async (req, res) => {
           tenantEmail,
           roomNumber: roomNumber.toString(),
           currentMonth,
+          rentAmount: rentAmount.toString(),
         },
       },
     });

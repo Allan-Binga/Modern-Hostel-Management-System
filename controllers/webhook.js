@@ -32,7 +32,16 @@ const handleStripeWebhook = async (req, res) => {
       const tenantEmail = session.metadata?.tenantEmail;
       const tenantName = session.metadata?.tenantName;
 
+      let amountPaid;
+
       try {
+        const paymentIntentId = session.payment_intent;
+        const paymentIntent = await stripe.paymentIntents.retrieve(
+          paymentIntentId
+        );
+        amountPaid = paymentIntent.metadata?.rentAmount;
+        // console.log(amountPaid);
+
         if (!paymentId) {
           throw new Error("Payment ID not found in session metadata.");
         }
@@ -80,10 +89,11 @@ const handleStripeWebhook = async (req, res) => {
         const paymentDate = new Date().toISOString().split("T")[0];
 
         await sendRentPaymentEmail(tenantEmail, {
-          // amountPaid: session.amount_total / 100,
+          amountPaid,
           roomNumber: roomNumber,
           paymentDate,
         });
+
         return res.status(200).send("Webhook received and processed.");
       } catch (error) {
         console.error("Error processing webhook:", error.message);

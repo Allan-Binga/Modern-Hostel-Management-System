@@ -95,7 +95,6 @@ const signUpTenant = async (req, res) => {
   } catch (error) {
     console.error("Tenant Registration Error:", error);
     res.status(500).json({ message: "Internal server error." });
-    console.log(error)
   }
 };
 
@@ -113,7 +112,9 @@ const signInTenant = async (req, res) => {
     const tenant = await client.query(checkTenantQuery, [email]);
 
     if (tenant.rows.length === 0) {
-      return res.status(401).json({ message: "Invalid credentials. Please try again." });
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials. Please try again." });
     }
 
     // Verify password
@@ -123,7 +124,9 @@ const signInTenant = async (req, res) => {
     );
 
     if (!isPasswordValid) {
-      return res.status(401).json({ message: "Invalid credentials. Please try again" });
+      return res
+        .status(401)
+        .json({ message: "Invalid credentials. Please try again" });
     }
 
     // Create JWT

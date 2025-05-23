@@ -18,7 +18,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // GENERATE PDF DOCUMENTS
-const createReceipt = ({  roomNumber, paymentDate }) => {
+const createReceipt = ({ amountPaid, roomNumber, currentDate }) => {
   return new Promise((resolve, reject) => {
     const doc = new PDFDocument({
       size: "A4",
@@ -33,13 +33,20 @@ const createReceipt = ({  roomNumber, paymentDate }) => {
     });
     doc.on("error", reject);
 
+    // Format the date nicely (e.g., May 22, 2025)
+    const formattedDate = new Date(currentDate).toLocaleDateString("en-KE", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
     const logoPath = path.join(__dirname, "../assets/prestigeLogo.png");
     if (fs.existsSync(logoPath)) {
       doc.image(logoPath, 50, 30, { width: 80 });
     }
 
-    // Adjusted values to center text relative to remaining space after logo
-    const contentWidth = 595.28 - 2 * 50; // A4 page width minus margins
+    // Centered header text
+    const contentWidth = 595.28 - 2 * 50;
     const headerX = 150;
     const headerWidth = contentWidth - 100;
 
@@ -71,21 +78,29 @@ const createReceipt = ({  roomNumber, paymentDate }) => {
       }
     );
 
+    // Add date at top-right
+    doc
+      .font("Helvetica")
+      .fontSize(10)
+      .fillColor("#333333")
+      .text(`Date: ${formattedDate}`, 400, 120, { align: "right" });
+
     // Title
     doc
       .font("Helvetica-Bold")
       .fontSize(16)
       .fillColor("#003087")
-      .text("Your receipt for", 0, 120, { align: "center" });
+      .text("Rent Payment Receipt", 0, 140, { align: "center" });
 
     doc.moveDown(2);
 
-    // Table-like section
-    const tableTop = 160;
+    // Table section
+    const tableTop = 180;
     const tableLeft = 50;
     const tableWidth = 500;
     const rowHeight = 30;
 
+    // Header row
     doc
       .rect(tableLeft, tableTop, tableWidth, rowHeight)
       .fill("#f5f5f5")
@@ -98,8 +113,9 @@ const createReceipt = ({  roomNumber, paymentDate }) => {
       .text("Description", tableLeft + 10, tableTop + 10)
       .text("Details", tableLeft + 300, tableTop + 10);
 
+    // Data rows
     doc
-      .rect(tableLeft, tableTop + rowHeight, tableWidth, rowHeight * 3)
+      .rect(tableLeft, tableTop + rowHeight, tableWidth, rowHeight * 2)
       .fill("#ffffff")
       .stroke("#dddddd");
 
@@ -107,19 +123,19 @@ const createReceipt = ({  roomNumber, paymentDate }) => {
       .font("Helvetica")
       .fontSize(11)
       .fillColor("#333333")
-      .text("Month", tableLeft + 10, tableTop + rowHeight + 10)
-      .text(paymentDate, tableLeft + 300, tableTop + rowHeight + 10)
-      .text("Room Number", tableLeft + 10, tableTop + rowHeight * 2 + 10)
-      .text(roomNumber, tableLeft + 300, tableTop + rowHeight * 2 + 10)
-      // .text("Amount", tableLeft + 10, tableTop + rowHeight * 3 + 10)
-      // .text(
-      //   `KES ${amountPaid.toLocaleString()}`,
-      //   tableLeft + 300,
-      //   tableTop + rowHeight * 3 + 10
-      // );
+      .text("Room Number", tableLeft + 10, tableTop + rowHeight + 10)
+      .text(roomNumber, tableLeft + 300, tableTop + rowHeight + 10)
+      .text("Amount Paid", tableLeft + 10, tableTop + rowHeight * 2 + 10)
+      .text(
+        `KES ${amountPaid}`,
+        tableLeft + 300,
+        tableTop + rowHeight * 2 + 10
+      );
 
-    doc.rect(tableLeft, tableTop, tableWidth, rowHeight * 4).stroke("#dddddd");
+    // Outer border
+    doc.rect(tableLeft, tableTop, tableWidth, rowHeight * 3).stroke("#dddddd");
 
+    // Thank you message
     doc
       .font("Helvetica")
       .fontSize(12)
@@ -127,10 +143,11 @@ const createReceipt = ({  roomNumber, paymentDate }) => {
       .text(
         "Thank you for trusting Prestige Hostels.",
         0,
-        tableTop + rowHeight * 5,
+        tableTop + rowHeight * 4,
         { align: "center" }
       );
 
+    // Footer
     const footerY = doc.page.height - 80;
     doc
       .font("Helvetica")
@@ -565,20 +582,25 @@ const verifyPasswordResetToken = async (req, res) => {
 };
 
 //Send Rent Payment Email
-const sendRentPaymentEmail = async (email, { roomNumber, paymentDate }) => {
+const sendRentPaymentEmail = async (
+  email,
+  { amountPaid, roomNumber, paymentDate }
+) => {
   const subject = "Rent Payment Confirmation";
+  // console.log(amountPaid);
+  // console.log(paymentDate);
 
   //Calculate Next Rent Date
   const currentDate = new Date(paymentDate);
   const nextPaymentDate = new Date(currentDate);
-  nextPaymentDate.setDate(currentDate.getDate() + 1);
+  nextPaymentDate.setDate(currentDate.getDate() + 30);
   const formattedNextPaymentDate = nextPaymentDate.toISOString().split("T")[0];
 
   //Generate PDF receipt
   const pdfBuffer = await createReceipt({
-    // amountPaid,
+    amountPaid,
     roomNumber,
-    // currentMonth,
+    currentDate,
   });
 
   const message = `
