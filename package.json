@@ -79,6 +79,7 @@
     "path": "^0.12.7",
     "path-to-regexp": "^8.2.0",
     "pdfkit": "^0.17.0",
+    "pg": "^8.16.0",
     "picomatch": "^2.3.1",
     "proxy-addr": "^2.0.7",
     "pstree.remy": "^1.1.8",
@@ -128,7 +129,7 @@
   "devDependencies": {
     "jest": "^29.7.0",
     "jest-mock": "^29.7.0",
-    "pg": "^8.16.0",
+    
     "supertest": "^7.1.1"
   }
 }
