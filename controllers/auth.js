@@ -95,6 +95,7 @@ const signUpTenant = async (req, res) => {
   } catch (error) {
     console.error("Tenant Registration Error:", error);
     res.status(500).json({ message: "Internal server error." });
+    console.log(error)
   }
 };
 
