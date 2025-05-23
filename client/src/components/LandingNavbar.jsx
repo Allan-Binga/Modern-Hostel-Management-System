@@ -77,10 +77,10 @@ function LandingNavbar() {
               aria-label="Visitor page"
             >
               <Info size={16} />
-              Are you a visitor? Click here
+              Are you a visitor? Click the login button.
             </Link>
             <Link
-              to="/login"
+              to="/visitors/login"
               onClick={() => setIsMenuOpen(false)}
               className="block bg-burgundy-500 text-white px-4 py-2 rounded-lg mt-2 flex items-center gap-2 hover:bg-burgundy-600 transition-all focus:outline-none focus:ring-2 focus:ring-burgundy-400"
               aria-label="Log in"

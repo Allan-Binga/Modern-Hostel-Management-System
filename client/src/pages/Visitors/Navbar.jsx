@@ -9,17 +9,9 @@ function VisitorNavbar() {
 
   const handleSignOut = async () => {
     try {
-      // Assuming an API endpoint to clear session
-      await axios.post(
-        `${endpoint}/auth/signout`,
-        {},
-        { withCredentials: true }
-      );
       toast.success("Signed out successfully!");
-      navigate("/login");
+      navigate("/visitors/login");
     } catch (error) {
-      showToast.error("Failed to sign out. Please try again.");
-      console.error("Sign out error:", error);
     }
   };
 

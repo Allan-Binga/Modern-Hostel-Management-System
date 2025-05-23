@@ -38,7 +38,7 @@ function App() {
         <Route path="/administrator/home" element={<AdministratorHome />} />
         <Route path="/visitors/login" element={<VisitorsLogin />} />
         <Route path="/prestige-hostels" element={<LandingPage />} />
-        <Route path="/visitor/home" element={<VisitorHomes/>} />
+        <Route path="/visitors/home" element={<VisitorHomes/>} />
         <Route path="/home" element={<TenantHome />} />
         <Route path="/signup" element={<TenantSignup />} />
         <Route path="/login" element={<TenantLogin />} />

@@ -41,7 +41,7 @@ function VisitorsLogin() {
     try {
       const response = await axios.post(`${endpoint}/visitors/sign-in`, payload);
       toast.success("Visitor sign-in successful!");
-      setTimeout(() => navigate("/visitor/home"), 4000);
+      setTimeout(() => navigate("/visitors/home"), 4000);
     } catch (error) {
       const message = error.response?.data?.message || "Something went wrong.";
       toast.error(message);

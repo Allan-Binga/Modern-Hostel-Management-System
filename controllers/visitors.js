@@ -14,7 +14,7 @@ const signInVisitor = async (req, res) => {
 
   try {
     // Check if the room exists and fetch its status
-    const roomQuery = "SELECT * FROM rooms WHERE roomId = $1";
+    const roomQuery = "SELECT * FROM rooms WHERE roomid = $1";
     const roomResult = await client.query(roomQuery, [visitedRoomId]);
 
     if (roomResult.rows.length === 0) {
@@ -23,9 +23,11 @@ const signInVisitor = async (req, res) => {
 
     const room = roomResult.rows[0];
 
-    // ❌ Reject visits to rooms that are occupied
-    if (room.status.toLowerCase() === 'Available') {
-      return res.status(403).json({ message: "Cannot visit an occupied room." });
+    //Reject
+    if (room.status.toLowerCase() === "Available") {
+      return res
+        .status(403)
+        .json({ message: "No tenant in this room. Please try another room." });
     }
 
     // Prevent multiple active visits
@@ -80,7 +82,6 @@ const signInVisitor = async (req, res) => {
     res.status(500).json({ message: "Internal server error." });
   }
 };
-
 
 // Visitor Sign-Out
 const signOutVisitor = async (req, res) => {
@@ -162,10 +163,7 @@ const getVisitors = async (req, res) => {
 //Fetch My Visitor
 const myVisitor = async (req, res) => {
   try {
-    
-  } catch (error) {
-    
-  }
-}
+  } catch (error) {}
+};
 
 module.exports = { getVisitors, signInVisitor, signOutVisitor, myVisitor };
