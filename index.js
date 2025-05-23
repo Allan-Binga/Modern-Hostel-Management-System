@@ -28,7 +28,10 @@ app.use("/prestige-hostel/v1/webhook", require("./routes/webhook"));
 app.use(express.json());
 
 //CORS Implementation
-const allowedOrigins = ["http://localhost:5173"];
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://prestige-girls-hostel-9c4772a37639.herokuapp.com",
+];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -68,7 +71,7 @@ if (process.env.NODE_ENV === "production") {
 
   // Fallback for frontend routes
   app.use((req, res, next) => {
-    if (req.method === "GET" && !req.path.startsWith("/murandi")) {
+    if (req.method === "GET" && !req.path.startsWith("/prestige")) {
       res.sendFile(path.join(clientDistPath, "index.html"));
     } else {
       next();
