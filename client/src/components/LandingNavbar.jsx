@@ -3,16 +3,11 @@ import { Link } from "react-router-dom";
 import { User, Info, Menu, X } from "lucide-react";
 import { toast } from "react-toastify";
 
-
 function LandingNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen((prev) => !prev);
-  };
-
-  const handleVisitorClick = () => {
-    toast.info("Redirecting to visitor page...");
   };
 
   return (
@@ -32,15 +27,14 @@ function LandingNavbar() {
 
           {/* Desktop Menu */}
           <div className="hidden sm:flex items-center gap-6">
-            <Link
+            <p
               to="/visitor"
-              onClick={handleVisitorClick}
               className="text-md text-burgundy-100 hover:text-burgundy-200 flex items-center gap-2 transition-colors hover:scale-105"
               aria-label="Visitor page"
             >
               <Info size={16} />
               Are you a visitor?
-            </Link>
+            </p>
             <Link
               to="/visitors/login"
               className="bg-burgundy-500 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-burgundy-600 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-burgundy-400"
@@ -67,22 +61,17 @@ function LandingNavbar() {
         {/* Mobile Menu Dropdown */}
         {isMenuOpen && (
           <div className="sm:hidden bg-burgundy-800 px-4 py-4 animate-slideUp">
-            <Link
-              to="/visitor"
-              onClick={() => {
-                handleVisitorClick();
-                setIsMenuOpen(false);
-              }}
-              className="block text-sm text-burgundy-100 hover:text-burgundy-200 py-2 flex items-center gap-2 transition-colors"
+            <p
+              className=" text-sm text-burgundy-100 hover:text-burgundy-200 py-2 flex items-center gap-2 transition-colors"
               aria-label="Visitor page"
             >
               <Info size={16} />
               Are you a visitor? Click the login button.
-            </Link>
+            </p>
             <Link
               to="/visitors/login"
               onClick={() => setIsMenuOpen(false)}
-              className="block bg-burgundy-500 text-white px-4 py-2 rounded-lg mt-2 flex items-center gap-2 hover:bg-burgundy-600 transition-all focus:outline-none focus:ring-2 focus:ring-burgundy-400"
+              className="bg-burgundy-500 text-white px-4 py-2 rounded-lg mt-2 flex items-center gap-2 hover:bg-burgundy-600 transition-all focus:outline-none focus:ring-2 focus:ring-burgundy-400"
               aria-label="Log in"
             >
               <User size={16} />

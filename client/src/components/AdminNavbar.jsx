@@ -1,6 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import Logo from "../assets/prestigeLogo.png";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { endpoint } from "../backendAPI";
 import {
   Home,
   WalletCards,
@@ -8,19 +10,15 @@ import {
   BadgeAlert,
   CircleUser,
   ChevronDown,
-  User,
-  Settings,
-  Mail,
   LogOutIcon,
   Menu,
-  UserPlus,
   X,
+  Users,
+  UserPlus,
 } from "lucide-react";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { endpoint } from "../backendAPI";
+import Logo from "../assets/prestigeLogo.png";
 
-function Navbar() {
+function AdminNavbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
@@ -28,28 +26,19 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    axios
-      .get(`${endpoint}/notifications/my-notifications`, {
-        withCredentials: true,
-      })
-      .then((res) => setNotifications(res.data))
-      .catch((err) => console.error("Failed to fetch notifications:", err));
-  }, []);
-
   const handleLogout = async () => {
     try {
       const response = await axios.post(
-        `${endpoint}/auth/tenant/sign-out`,
+        `${endpoint}/auth/administrator/sign-out`,
         {},
         { withCredentials: true }
       );
 
       if (response.status === 200) {
-        document.cookie = "tenantPrestigeSession=; Max-Age=0; path=/;";
-        localStorage.removeItem("tenantId");
+        document.cookie = "adminPrestigeSession=; Max-Age=0; path=/;";
+        localStorage.removeItem("adminId");
         toast.success("Successfully logged out.");
-        setTimeout(() => navigate("/login"), 4000);
+        setTimeout(() => navigate("/administrator/login"), 4000);
       } else {
         toast.error("You are not logged in.");
       }
@@ -77,7 +66,7 @@ function Navbar() {
   return (
     <nav className="relative px-4 py-4 flex justify-between items-center bg-burgundy-600 shadow-md">
       {/* Logo */}
-      <a href="/home" className="flex items-center space-x-2">
+      <a href="/administrator/home" className="flex items-center space-x-2">
         <img src={Logo} alt="Prestige Logo" className="h-10 w-auto" />
         <span className="text-white text-2xl font-semibold select-none hidden lg:inline">
           Prestige Girls Hostel
@@ -96,11 +85,24 @@ function Navbar() {
       {/* Desktop Nav */}
       <ul className="hidden lg:flex lg:items-center lg:space-x-6 text-white font-medium tracking-wide">
         {[
-          { to: "/home", icon: Home, label: "Home" },
-          { to: "/visitors", icon: UserPlus, label: "Visitors" },
-          { to: "/bookings", icon: WalletCards, label: "Rent & Booking" },
-          { to: "/issue-reports", icon: BadgeAlert, label: "Issue Reports" },
-          { to: "/advertisements", icon: Megaphone, label: "Advertisements" },
+          { to: "/administrator/home", icon: Home, label: "Home" },
+          { to: "/tenants", icon: Users, label: "Tenants" },
+          {to: "/administrator/visitors", icon: UserPlus, label: "Visitors"},
+          {
+            to: "/administrator/bookings",
+            icon: WalletCards,
+            label: "Booking & Payments",
+          },
+          {
+            to: "/administrator/issue-reports",
+            icon: BadgeAlert,
+            label: "Issue Reports",
+          },
+          {
+            to: "/administrator/advertisements",
+            icon: Megaphone,
+            label: "Tenant Advertisements",
+          },
         ].map(({ to, icon: Icon, label }) => (
           <li key={to} className="flex items-center space-x-2">
             <Icon
@@ -142,15 +144,6 @@ function Navbar() {
           {isDropdownOpen && (
             <ul className="absolute top-full mt-2 w-44 bg-white text-gray-900 rounded-lg shadow-lg z-50 border">
               <li>
-                <a
-                  href="/account-settings"
-                  className="flex items-center px-5 py-3 hover:bg-gray-100"
-                >
-                  <Settings className="w-5 h-5 mr-2" />
-                  Account Settings
-                </a>
-              </li>
-              <li>
                 <button
                   onClick={handleLogout}
                   className="flex items-center px-5 py-3 text-red-600 hover:bg-red-100 w-full text-left"
@@ -167,14 +160,9 @@ function Navbar() {
       {/* Right icons (Desktop only) */}
       <div className="hidden lg:flex items-center space-x-6">
         <a
-          href="/messages"
-          className={`relative transition-colors duration-200 ${
-            isActive("/messages")
-              ? "text-amber-300"
-              : "text-white hover:text-amber-200"
-          }`}
+          href="/administrator/messages"
+          className="relative text-white hover:text-amber-300"
         >
-          <Mail size={28} />
           {notifications.length > 0 && (
             <span className="absolute -top-2 -right-2 bg-amber-400 text-burgundy-900 text-xs font-semibold rounded-full px-2 py-0.5">
               {notifications.length}
@@ -194,11 +182,23 @@ function Navbar() {
       {isMobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-burgundy-700 text-white z-40 py-4 px-6 space-y-4 lg:hidden shadow-md">
           {[
-            { to: "/home", icon: Home, label: "Home" },
-            { to: "/visitors", icon: UserPlus, label: "Visitors" },
-            { to: "/bookings", icon: WalletCards, label: "Rent & Booking" },
-            { to: "/issue-reports", icon: BadgeAlert, label: "Issue Reports" },
-            { to: "/advertisements", icon: Megaphone, label: "Advertisements" },
+            { to: "/administrator/home", icon: Home, label: "Home" },
+            { to: "/tenants", icon: Users, label: "Tenants" },
+            {
+              to: "/administrator/bookings",
+              icon: WalletCards,
+              label: "Rent & Booking",
+            },
+            {
+              to: "/administrator/issue-reports",
+              icon: BadgeAlert,
+              label: "Issue Reports",
+            },
+            {
+              to: "/administrator/advertisements",
+              icon: Megaphone,
+              label: "Advertisements",
+            },
           ].map(({ to, icon: Icon, label }) => (
             <a
               key={to}
@@ -209,13 +209,7 @@ function Navbar() {
               <span>{label}</span>
             </a>
           ))}
-          <a
-            href="/messages"
-            className="flex items-center space-x-3 text-lg hover:text-amber-300"
-          >
-            <Mail size={24} />
-            <span>Messages</span>
-          </a>
+
           <button
             onClick={handleLogout}
             className="flex items-center space-x-3 text-lg text-red-400 hover:text-red-600"
@@ -229,4 +223,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default AdminNavbar;

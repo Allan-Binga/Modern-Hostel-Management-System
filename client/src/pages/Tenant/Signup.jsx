@@ -4,8 +4,6 @@ import Spinner from "../../components/Spinner";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { endpoint } from "../../backendAPI";
@@ -28,6 +26,20 @@ function TenantSignup() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Handle invalid characters in name fields
+    if (
+      (name === "firstName" || name === "lastName") &&
+      /[^a-zA-Z\s]/.test(value)
+    ) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        [name]: "Only valid names are allowed.",
+      }));
+    } else {
+      setFieldErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
@@ -77,6 +89,28 @@ function TenantSignup() {
               setSuccess("");
               setLoading(true);
 
+              // Client-side validation
+              const newErrors = {};
+
+              if (!/^[a-zA-Z]+$/.test(formData.firstName.trim())) {
+                newErrors.firstName = "First name must contain only letters.";
+              }
+
+              if (
+                formData.password.length < 8 ||
+                !/[A-Z]/.test(formData.password) ||
+                !/\d/.test(formData.password)
+              ) {
+                newErrors.password =
+                  "Password must be at least 8 characters, include a number and an uppercase letter.";
+              }
+
+              if (Object.keys(newErrors).length > 0) {
+                setFieldErrors(newErrors);
+                setLoading(false);
+                return;
+              }
+
               try {
                 const res = await fetch(`${endpoint}/auth/tenant/sign-up`, {
                   method: "POST",
@@ -87,11 +121,14 @@ function TenantSignup() {
                 const data = await res.json();
 
                 if (!res.ok) {
-                  //Handle Password Related Errors
+                  setFieldErrors({});
                   if (data.message?.toLowerCase().includes("password")) {
                     setFieldErrors({ password: data.message });
+                  } else if (
+                    data.message?.toLowerCase().includes("first name")
+                  ) {
+                    setFieldErrors({ firstName: data.message });
                   } else {
-                    setFieldErrors({});
                     toast.error(data.message || "Something went wrong.");
                   }
                   return;
@@ -121,6 +158,11 @@ function TenantSignup() {
                   placeholder="John"
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
                 />
+                {fieldErrors.firstName && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {fieldErrors.firstName}
+                  </p>
+                )}
               </div>
               <div className="w-1/2">
                 <label className="block text-md font-medium text-gray-700">
@@ -134,6 +176,11 @@ function TenantSignup() {
                   placeholder="Doe"
                   className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
                 />
+                {fieldErrors.lastName && (
+                  <p className="text-red-500 text-xs mt-1">
+                    {fieldErrors.lastName}
+                  </p>
+                )}
               </div>
             </div>
 
@@ -229,7 +276,10 @@ function TenantSignup() {
           {/* Sign In Link */}
           <p className="text-center text-md text-gray-600">
             Already have an account?{" "}
-            <Link to="/login" className="text-burgundy-500 font-semibold hover:text-pink-950 hover:underline">
+            <Link
+              to="/login"
+              className="text-burgundy-500 font-semibold hover:text-pink-950 hover:underline"
+            >
               Sign In
             </Link>
           </p>

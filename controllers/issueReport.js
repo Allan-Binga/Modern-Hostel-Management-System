@@ -158,9 +158,15 @@ const assignTechnician = async (req, res) => {
       [technician.technician_id]
     );
 
+    // await client.query(
+    //   "UPDATE technicians SET assignment_status = 'Assigned' WHERE technician_id = $1",
+    //   [technician.technician_id]
+    // );
+
+    // Update the issue's status to 'Assigned'
     await client.query(
-      "UPDATE technicians SET assignment_status = 'Assigned' WHERE technician_id = $1",
-      [technician.technician_id]
+      "UPDATE issues SET status = 'Assigned' WHERE issue_id = $1",
+      [issueId]
     );
 
     // Get tenant's email
@@ -181,8 +187,10 @@ const assignTechnician = async (req, res) => {
       issue.category
     );
 
-    //Notification Creation
-    // await createNotification(tenantId, )
+    // Notification Creation
+    const notificationMessage = `Good news, technician ${technician.name} (Phone: ${technician.phone_number}) has been assigned to your issue regarding ${issue.category}.`;
+
+    await createNotification(issue.tenant_id, notificationMessage);
 
     return res.status(200).json({
       message: "Technician assigned successfully.",

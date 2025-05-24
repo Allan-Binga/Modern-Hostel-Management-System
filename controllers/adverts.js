@@ -118,8 +118,9 @@ const approveAdvertisement = async (req, res) => {
       });
     }
 
-    // Ensure the advertisement is not already approved
     const advertisement = adResult.rows[0];
+
+    // Ensure the advertisement is not already approved
     if (advertisement.approval_status === "Approved") {
       return res.status(400).json({
         error: "This advertisement is already approved.",
@@ -134,6 +135,12 @@ const approveAdvertisement = async (req, res) => {
         RETURNING ad_id, ad_title, approval_status;
       `;
     const updateResult = await client.query(updateQuery, [adId]);
+
+    // Send notification to tenant
+    await createNotification(
+      advertisement.tenant_id,
+      "Good news, your advertisement was approved!"
+    );
 
     // Return success response
     return res.status(200).json({
@@ -163,8 +170,9 @@ const rejectAdvertisement = async (req, res) => {
       });
     }
 
-    // Ensure the advertisement is not already rejected
     const advertisement = adResult.rows[0];
+
+    // Ensure the advertisement is not already rejected
     if (advertisement.approval_status === "Rejected") {
       return res.status(400).json({
         error: "This advertisement is already rejected.",
@@ -179,6 +187,12 @@ const rejectAdvertisement = async (req, res) => {
         RETURNING ad_id, ad_title, approval_status;
       `;
     const updateResult = await client.query(updateQuery, [adId]);
+
+    // Send notification to tenant
+    await createNotification(
+      advertisement.tenant_id,
+      "Unfortunately, your advertisement was rejected."
+    );
 
     // Return success response
     return res.status(200).json({

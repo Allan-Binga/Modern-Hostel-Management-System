@@ -39,7 +39,10 @@ function VisitorsLogin() {
     };
 
     try {
-      const response = await axios.post(`${endpoint}/visitors/sign-in`, payload);
+      const response = await axios.post(
+        `${endpoint}/visitors/sign-in`,
+        payload
+      );
       toast.success("Visitor sign-in successful!");
       setTimeout(() => navigate("/visitors/home"), 4000);
     } catch (error) {
@@ -64,7 +67,10 @@ function VisitorsLogin() {
       {/* Right: Form */}
       <div className="lg:w-1/2 w-full flex items-center justify-center p-6 lg:p-12 bg-white relative">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50" aria-busy="true">
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-white/50 z-50"
+            aria-busy="true"
+          >
             <Spinner />
           </div>
         )}
@@ -75,14 +81,19 @@ function VisitorsLogin() {
           </div>
 
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900">Hello Visitor! 👋</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Hello Visitor! 👋
+            </h2>
             <p className="text-lg text-gray-700">Please sign in to proceed</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label htmlFor="name" className="block text-md font-medium text-gray-700">
+              <label
+                htmlFor="name"
+                className="block text-md font-medium text-gray-700"
+              >
                 Name
               </label>
               <input
@@ -99,7 +110,9 @@ function VisitorsLogin() {
 
             {/* Phone Number */}
             <div>
-              <label className="block text-md font-medium text-gray-700">Phone Number</label>
+              <label className="block text-md font-medium text-gray-700">
+                Phone Number
+              </label>
               <PhoneInput
                 country={"ke"}
                 value={formData.phoneNumber}
@@ -111,7 +124,10 @@ function VisitorsLogin() {
 
             {/* Visited Room */}
             <div>
-              <label htmlFor="visitedRoomId" className="block text-md font-medium text-gray-700">
+              <label
+                htmlFor="visitedRoomId"
+                className="block text-md font-medium text-gray-700"
+              >
                 Visited Room
               </label>
               <select
@@ -133,7 +149,10 @@ function VisitorsLogin() {
 
             {/* Planned Exit Time */}
             <div>
-              <label htmlFor="plannedExitTime" className="block text-md font-medium text-gray-700">
+              <label
+                htmlFor="plannedExitTime"
+                className="block text-md font-medium text-gray-700"
+              >
                 Planned Exit Time (24hr format e.g. 20:00)
               </label>
               <input
@@ -167,6 +186,20 @@ function VisitorsLogin() {
             Are you an administrator?{" "}
             <Link
               to="/administrator/login"
+              className="text-burgundy-500 hover:underline font-semibold hover:text-pink-900"
+            >
+              Click Here
+            </Link>
+          </p>
+          <div className="flex items-center justify-center space-x-2">
+            <hr className="w-1/4 border-gray-300" />
+            <span className="text-md text-gray-500">Or</span>
+            <hr className="w-1/4 border-gray-300" />
+          </div>
+          <p className="text-center text-md text-gray-600">
+            Tenant?{" "}
+            <Link
+              to="/login"
               className="text-burgundy-500 hover:underline font-semibold hover:text-pink-900"
             >
               Click Here

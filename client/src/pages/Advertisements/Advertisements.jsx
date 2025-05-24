@@ -184,7 +184,15 @@ function Advertisements() {
                           <Tag size={16} />
                           <span>{ad.product_category}</span>
                         </div>
-                        <div className="flex items-center gap-1 text-green-600 font-bold">
+                        <div
+                          className={`flex items-center gap-1 font-bold ${
+                            ad.approval_status === "Approved"
+                              ? "text-green-600"
+                              : ad.approval_status === "Pending"
+                              ? "text-blue-600"
+                              : "text-red-400"
+                          }`}
+                        >
                           <CheckCircle size={16} />
                           <span>{ad.approval_status}</span>
                         </div>
@@ -265,7 +273,15 @@ function Advertisements() {
                         <Tag size={16} />
                         <span>{ad.product_category}</span>
                       </div>
-                      <div className="flex items-center gap-1 text-green-600 font-bold">
+                      <div
+                        className={`flex items-center gap-1 font-bold ${
+                          ad.approval_status === "Approved"
+                            ? "text-green-600"
+                            : ad.approval_status === "Pending"
+                            ? "text-blue-600"
+                            : "text-red-400"
+                        }`}
+                      >
                         <CheckCircle size={16} />
                         <span>{ad.approval_status}</span>
                       </div>

@@ -27,6 +27,12 @@ import Failure from "./pages/PaymentFailure/Failure";
 import PasswordChange from "./pages/PasswordReset/PasswordChange";
 import VisitorsLogin from "./pages/Visitors/Login";
 import VisitorHomes from "./pages/Visitors/Home";
+import AdminBookings from "./pages/Bookings/AdminBookings";
+import AdminReports from "./pages/Reports/AdminReports";
+import AdminAdvertisements from "./pages/Advertisements/AdminAdvertisements";
+import Tenants from "./pages/Tenants/Tenants";
+import TenantVisitors from "./pages/Visitors/TenantVisitors";
+import AdminVisitors from "./pages/Visitors/AdminVisitors";
 
 function App() {
   return (
@@ -38,7 +44,7 @@ function App() {
         <Route path="/administrator/home" element={<AdministratorHome />} />
         <Route path="/visitors/login" element={<VisitorsLogin />} />
         <Route path="/prestige-hostels" element={<LandingPage />} />
-        <Route path="/visitors/home" element={<VisitorHomes/>} />
+        <Route path="/visitors/home" element={<VisitorHomes />} />
         <Route path="/home" element={<TenantHome />} />
         <Route path="/signup" element={<TenantSignup />} />
         <Route path="/login" element={<TenantLogin />} />
@@ -54,6 +60,15 @@ function App() {
         <Route path="/messages" element={<Messages />} />
         <Route path="/payments/success" element={<Success />} />
         <Route path="/payments/failure" element={<Failure />} />
+        <Route path="/administrator/bookings" element={<AdminBookings />} />
+        <Route path="/administrator/issue-reports" element={<AdminReports />} />
+        <Route
+          path="/administrator/advertisements"
+          element={<AdminAdvertisements />}
+        />
+        <Route path="/tenants" element={<Tenants />} />
+        <Route path="/administrator/visitors" element={<AdminVisitors />} />
+        <Route path="/visitors" element={<TenantVisitors />} />
       </Routes>
 
       {/* Global ToastContainer */}

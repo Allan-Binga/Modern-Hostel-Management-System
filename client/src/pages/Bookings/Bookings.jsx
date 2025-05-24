@@ -111,7 +111,7 @@ function Bookings() {
       <Navbar />
       <main className="flex-grow px-4 py-8 max-w-7xl mx-auto">
         {/* Hero Header */}
-        <header className="mb-8 text-center">
+        <header className="mb-8 animate-fadeIn">
           <h1 className="text-4xl md:text-5xl font-extrabold text-burgundy-800 animate-slideIn">
             My Booking
           </h1>

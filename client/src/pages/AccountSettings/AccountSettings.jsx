@@ -246,7 +246,7 @@ function AccountSettings() {
                       value={profileForm.firstName}
                       onChange={handleProfileChange}
                       placeholder="Enter your first name"
-                      className="w-full p-3 border border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
                       required
                       aria-required="true"
                     />
@@ -301,13 +301,13 @@ function AccountSettings() {
                       loading ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
-                     Update Profile
+                    Update Profile
                   </button>
                 </div>
               </section>
 
               {/* Preferences */}
-              <section
+              {/* <section
                 className="bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
                 style={{ animationDelay: "0.1s" }}
               >
@@ -333,7 +333,7 @@ function AccountSettings() {
                     </label>
                   </div>
                 </div>
-              </section>
+              </section> */}
             </div>
 
             {/* Right Column: Security & Notifications */}

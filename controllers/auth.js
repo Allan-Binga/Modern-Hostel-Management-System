@@ -14,6 +14,14 @@ const signUpTenant = async (req, res) => {
     return res.status(400).json({ message: "All fields are required." });
   }
 
+  // Name Format Validation
+  const nameRegex = /^[A-Za-z]+$/;
+  if (!nameRegex.test(firstName) || !nameRegex.test(lastName)) {
+    return res.status(400).json({
+      message: "First name and last name must contain only letters.",
+    });
+  }
+
   // Email Format Validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
@@ -27,6 +35,14 @@ const signUpTenant = async (req, res) => {
     return res.status(400).json({
       message:
         "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.",
+    });
+  }
+
+  // Validate Phone Number Format
+  const phoneRegex = /^(07\d{8}|01\d{8})$/;
+  if (!phoneRegex.test(phoneNumber)) {
+    return res.status(400).json({
+      message: "Phone number must start with 07 or 01 and be 10 digits long.",
     });
   }
 
@@ -198,6 +214,14 @@ const signUpAdmin = async (req, res) => {
     return res.status(400).json({
       message:
         "Password must be at least 8 characters long, include one uppercase letter, one lowercase letter, one number, and one special character.",
+    });
+  }
+
+  // Validate Phone Number Format
+  const phoneRegex = /^(07\d{8}|01\d{8})$/;
+  if (!phoneRegex.test(phoneNumber)) {
+    return res.status(400).json({
+      message: "Phone number must start with 07 or 01 and be 10 digits long.",
     });
   }
 

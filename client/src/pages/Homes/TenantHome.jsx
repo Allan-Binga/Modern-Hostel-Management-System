@@ -17,6 +17,7 @@ import {
   Filter,
   CheckCircle,
   X,
+  FileDigit,
 } from "lucide-react";
 import { toast } from "react-toastify";
 
@@ -181,7 +182,7 @@ function TenantHome() {
                       "en-GB",
                       { day: "numeric", month: "long", year: "numeric" }
                     )
-                  : "N/A"}
+                  : " N/A"}
               </p>
             </div>
             <div>
@@ -220,6 +221,15 @@ function TenantHome() {
                       />
                     </div>
                   )}
+                  <div
+                    className="flex items-center gap-3 animate-stagger"
+                    style={{ animationDelay: "0.1s" }}
+                  >
+                    <FileDigit size={24} className="text-burgundy-600" />
+                    <p>
+                      <strong>Room ID:</strong> {myRoom.roomid}
+                    </p>
+                  </div>
                   <div
                     className="flex items-center gap-3 animate-stagger"
                     style={{ animationDelay: "0.1s" }}

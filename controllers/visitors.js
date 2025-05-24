@@ -23,11 +23,15 @@ const signInVisitor = async (req, res) => {
 
     const room = roomResult.rows[0];
 
-    //Reject
-    if (room.status.toLowerCase() === "Available") {
-      return res
-        .status(403)
-        .json({ message: "No tenant in this room. Please try another room." });
+    // Normalize status
+    const status = room.status?.trim().toLowerCase();
+
+    // Reject visit if room is not occupied
+    if (status === "available") {
+      return res.status(403).json({
+        message:
+          "No tenant in this room. Please request for a room ID from the tenant.",
+      });
     }
 
     // Prevent multiple active visits
@@ -51,6 +55,12 @@ const signInVisitor = async (req, res) => {
     const finalPlannedExitTime = new Date(
       `${new Date().toISOString().split("T")[0]}T${plannedExitTime}:00`
     );
+
+    if (finalPlannedExitTime.getHours() > 19) {
+      return res
+        .status(400)
+        .json({ message: "Exit time cannot be later than 7PM." });
+    }
 
     if (finalPlannedExitTime < finalEntryTime) {
       return res
@@ -85,40 +95,41 @@ const signInVisitor = async (req, res) => {
 
 // Visitor Sign-Out
 const signOutVisitor = async (req, res) => {
-  const { visitorId, actualExitTime } = req.body;
+  const { phoneNumber, actualExitTime } = req.body;
 
-  if (!visitorId || !actualExitTime) {
+  if (!phoneNumber || !actualExitTime) {
     return res.status(400).json({
-      message: "Visitor ID and actual exit time are required to sign out.",
+      message: "Phone number and actual exit time are required to sign out.",
     });
   }
 
   try {
-    // Verify visitor exists
-    const checkVisitorQuery = "SELECT * FROM visitors WHERE visitorId = $1";
-    const visitor = await client.query(checkVisitorQuery, [visitorId]);
+    // Find active visitor by phone number
+    const checkVisitorQuery = `
+      SELECT * FROM visitors 
+      WHERE phonenumber = $1 AND is_active = true
+      ORDER BY entrytime DESC
+      LIMIT 1;
+    `;
+    const visitorResult = await client.query(checkVisitorQuery, [phoneNumber]);
 
-    if (visitor.rows.length === 0) {
-      return res.status(404).json({ message: "Visitor not found." });
-    }
-
-    const { entrytime, plannedexittime, is_active } = visitor.rows[0];
-
-    if (!is_active) {
+    if (visitorResult.rows.length === 0) {
       return res
-        .status(400)
-        .json({ message: "Visitor is already signed out." });
+        .status(404)
+        .json({ message: "Active visit not found for this phone number." });
     }
+
+    const visitor = visitorResult.rows[0];
+    const { visitorid, entrytime, plannedexittime } = visitor;
 
     const finalActualExitTime = new Date(
       `${new Date().toISOString().split("T")[0]}T${actualExitTime}:00`
     );
 
-    // Validate Actual Exit Time
     if (finalActualExitTime < new Date(entrytime)) {
-      return res
-        .status(400)
-        .json({ message: "Actual exit time cannot be before entry time." });
+      return res.status(400).json({
+        message: "Actual exit time cannot be before entry time.",
+      });
     }
 
     if (finalActualExitTime > new Date(plannedexittime)) {
@@ -127,17 +138,16 @@ const signOutVisitor = async (req, res) => {
       });
     }
 
-    // Sign out the visitor (soft delete)
+    // Update exit time and mark visitor inactive
     const updateExitTimeQuery = `
       UPDATE visitors 
-      SET exitTime = $1, is_active = false 
-      WHERE visitorId = $2 
+      SET exittime = $1, is_active = false 
+      WHERE visitorid = $2 
       RETURNING *;
     `;
-
     const updatedVisitor = await client.query(updateExitTimeQuery, [
       finalActualExitTime,
-      visitorId,
+      visitorid,
     ]);
 
     res.status(200).json({
@@ -160,10 +170,38 @@ const getVisitors = async (req, res) => {
   }
 };
 
-//Fetch My Visitor
+// Fetch My Visitors (Active)
 const myVisitor = async (req, res) => {
+  const tenantId = req.tenantId;
+
   try {
-  } catch (error) {}
+    // Step 1: Get rooms booked by this tenant
+    const roomQuery = `
+      SELECT room_id FROM bookings 
+      WHERE tenant_id = $1
+    `;
+    const roomResult = await client.query(roomQuery, [tenantId]);
+
+    if (roomResult.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No room found for this tenant." });
+    }
+
+    const roomIds = roomResult.rows.map((row) => row.room_id);
+
+    // Step 2: Fetch active visitors to these rooms
+    const visitorsQuery = `
+      SELECT * FROM visitors 
+      WHERE visitedroomid = ANY($1) AND is_active = true
+    `;
+    const visitorsResult = await client.query(visitorsQuery, [roomIds]);
+
+    res.status(200).json({ visitors: visitorsResult.rows });
+  } catch (error) {
+    console.error("Fetch My Visitor Error:", error);
+    res.status(500).json({ message: "Internal server error." });
+  }
 };
 
 module.exports = { getVisitors, signInVisitor, signOutVisitor, myVisitor };

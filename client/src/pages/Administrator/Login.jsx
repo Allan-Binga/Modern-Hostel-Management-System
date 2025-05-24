@@ -4,13 +4,63 @@ import Spinner from "../../components/Spinner";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
-import { ToastContainer, toast, Bounce } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { endpoint } from "../../backendAPI";
+import { toast } from "react-toastify";
+import LandingNavbar from "../../components/LandingNavbar";
 
 function AdministratorLogin() {
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${endpoint}/auth/administrator/sign-in`, {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed, please try again.");
+      }
+
+      localStorage.setItem("adminId", data.admin.id);
+
+      toast.success("Login successful.");
+      setTimeout(() => {
+        navigate("/administrator/home");
+      }, 4000);
+    } catch (error) {
+      const errorMessage = error.message?.toLowerCase?.();
+
+      if (errorMessage?.includes("already logged in")) {
+        toast.info("You are already logged in.", {
+          className:
+            "bg-blue-100 text-blue-800 font-medium rounded-md p-3 shadow",
+        });
+        navigate("/administrator/home");
+      } else {
+        toast.error(error.message || "Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
@@ -26,6 +76,11 @@ function AdministratorLogin() {
       {/* Right Section - Signup Form */}
       <div className="lg:w-1/2 w-full flex items-center justify-center p-6 lg:p-12 bg-white">
         <div className="max-w-md w-full space-y-6 flex flex-col items-center">
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center bg-white/50 z-50">
+              <Spinner />
+            </div>
+          )}
           {/* Logo */}
           <div className="flex items-center justify-center">
             <img src={Logo} alt="Wealth Wave Logo" className="w-50 h-50" />
@@ -34,18 +89,21 @@ function AdministratorLogin() {
           {/* Welcome Text */}
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">
-            Administrator Login
+              Administrator Login
             </h2>
           </div>
 
           {/* Form */}
-          <form className="space-y-6 w-full">
+          <form onSubmit={handleSubmit} className="space-y-6 w-full">
             <div>
               <label className="block text-md font-medium text-gray-700">
                 Email
               </label>
               <input
                 type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 placeholder="johndoe@gmail.com"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
@@ -57,6 +115,9 @@ function AdministratorLogin() {
               </label>
               <input
                 type={showPassword ? "text" : "password"}
+                name="password"
+                value={formData.password}
+                onChange={handleChange}
                 placeholder="••••••••"
                 className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
@@ -68,7 +129,7 @@ function AdministratorLogin() {
               </span>
             </div>
 
-            {/* Signup Button */}
+            {/* SignIn Button */}
             <button
               type="submit"
               className="w-full py-3 bg-burgundy-500 text-white rounded-full hover:bg-burgundy-400 transition duration-200 cursor-pointer"
@@ -79,9 +140,12 @@ function AdministratorLogin() {
 
           {/* Sign In Link */}
 
-          <p className="text-center text-md text-gray-600">
+          <p className="text-center text-md text-gray-600 font-semibold">
             Don't have an account?{" "}
-            <Link to="/administrator/signup" className="text-burgundy-500 hover:underline">
+            <Link
+              to="/administrator/signup"
+              className="text-burgundy-500 hover:underline"
+            >
               Sign Up
             </Link>
           </p>
@@ -94,12 +158,9 @@ function AdministratorLogin() {
           </div>
 
           {/* Administrator Signup */}
-          <p className="text-center text-md text-gray-600">
+          <p className="text-center text-md text-gray-600 font-semibold">
             Are you a resident?{" "}
-            <Link
-              to="/login"
-              className="text-burgundy-500 hover:underline"
-            >
+            <Link to="/login" className="text-burgundy-500 hover:underline">
               Click Here
             </Link>
           </p>

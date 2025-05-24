@@ -114,13 +114,8 @@ function IssueReport() {
             </h2>
             {fetchError && <p className="text-red-500 mb-4">{fetchError}</p>}
             {reportsLoading ? (
-              <div className="space-y-4">
-                {[...Array(3)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-24 bg-burgundy-200 rounded-lg animate-pulse"
-                  ></div>
-                ))}
+              <div className="flex justify-center items-center py-12">
+                <Spinner size="medium" />
               </div>
             ) : issueReports.length === 0 ? (
               <p className="text-gray-600 italic text-center">
@@ -189,7 +184,7 @@ function IssueReport() {
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowModal(false)}
               >
-                <X />
+                <X size={24} />
               </button>
               <h2 className="text-2xl font-bold text-burgundy-800 mb-4">
                 Report an Issue
