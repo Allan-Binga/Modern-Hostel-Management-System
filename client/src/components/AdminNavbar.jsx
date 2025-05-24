@@ -87,7 +87,7 @@ function AdminNavbar() {
         {[
           { to: "/administrator/home", icon: Home, label: "Home" },
           { to: "/tenants", icon: Users, label: "Tenants" },
-          {to: "/administrator/visitors", icon: UserPlus, label: "Visitors"},
+          { to: "/administrator/visitors", icon: UserPlus, label: "Visitors" },
           {
             to: "/administrator/bookings",
             icon: WalletCards,
@@ -183,6 +183,11 @@ function AdminNavbar() {
         <div className="absolute top-full left-0 w-full bg-burgundy-700 text-white z-40 py-4 px-6 space-y-4 lg:hidden shadow-md">
           {[
             { to: "/administrator/home", icon: Home, label: "Home" },
+            {
+              to: "/administrator/visitors",
+              icon: UserPlus,
+              label: "Visitors",
+            },
             { to: "/tenants", icon: Users, label: "Tenants" },
             {
               to: "/administrator/bookings",
