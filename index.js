@@ -30,6 +30,7 @@ app.use(express.json());
 //CORS Implementation
 const allowedOrigins = [
   "http://localhost:5173",
+  "https://www.prestigegirlshostel.co.ke",
   "https://prestige-girls-hostel-9c4772a37639.herokuapp.com",
 ];
 
