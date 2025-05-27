@@ -160,6 +160,7 @@ const signInTenant = async (req, res) => {
     res.cookie("tenantPrestigeSession", tenantToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -309,6 +310,7 @@ const signInAdmin = async (req, res) => {
     res.cookie("adminPrestigeSession", adminToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
+      sameSite: "None",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
