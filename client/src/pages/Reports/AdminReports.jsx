@@ -317,7 +317,7 @@ function AdminReports() {
                 </div>
                 <div className="flex items-center gap-2 text-base">
                   <Calendar size={20} className="text-burgundy-600" />
-                  Submitted: {formatDate(selectedIssue.submission_date)}
+                  Submitted: {formatDate(selectedIssue.reported_date)}
                 </div>
               </div>
               {selectedIssue.status === "OPEN" && (
