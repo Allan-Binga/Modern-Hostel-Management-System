@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { endpoint } from "../../backendAPI";
-import LandingNavbar from "../../components/LandingNavbar";
+import LandingNavbar from "../../components/LandingNavbar"; 
 
 function TenantLogin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -24,6 +24,7 @@ function TenantLogin() {
     setLoading(true);
 
     try {
+      // const response = await fetch("http://localhost:5900/prestige-hostel/v1/auth/tenant/sign-in")
       const response = await fetch(`${endpoint}/auth/tenant/sign-in`, {
         method: "POST",
         credentials: "include",

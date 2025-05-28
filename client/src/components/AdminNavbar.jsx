@@ -69,7 +69,7 @@ function AdminNavbar() {
       <a href="/administrator/home" className="flex items-center space-x-2">
         <img src={Logo} alt="Prestige Logo" className="h-10 w-auto" />
         <span className="text-white text-2xl font-semibold select-none hidden lg:inline">
-          Prestige Girls Hostel
+          Hostel Management System
         </span>
       </a>
 

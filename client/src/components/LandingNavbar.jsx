@@ -21,7 +21,7 @@ function LandingNavbar() {
               className="text-lg font-bold text-burgundy-100 hover:text-burgundy-200 transition-colors"
               aria-label="Home"
             >
-              Prestige Hostels
+              Prestige Hostels Apartment Management System
             </Link>
           </div>
 

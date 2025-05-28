@@ -165,6 +165,7 @@ const getVisitors = async (req, res) => {
   try {
     const visitors = await client.query("SELECT * FROM visitors");
     res.status(200).json(visitors.rows);
+    console.log(visitors)
   } catch (error) {
     res.status(500).json({ mesage: "Could not fetch rooms." });
   }
