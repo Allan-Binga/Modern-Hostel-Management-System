@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { User, Info, Menu, X } from "lucide-react";
-import { toast } from "react-toastify";
+// import { toast } from "react-toastify";
 
 function LandingNavbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -21,7 +21,7 @@ function LandingNavbar() {
               className="text-lg font-bold text-burgundy-100 hover:text-burgundy-200 transition-colors"
               aria-label="Home"
             >
-              Prestige Hostels Apartment Management System
+              Hostel Management System
             </Link>
           </div>
 
