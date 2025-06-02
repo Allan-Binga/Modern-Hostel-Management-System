@@ -51,12 +51,12 @@ app.use(cors(corsOptions));
 app.use(cookieParser());
 
 // Hide env file
-app.use((req, res, next) => {
-  if (req.path === "/.env" || req.path.startsWith("/.")) {
-    return res.status(403).send("Forbidden");
-  }
-  next();
-});
+// app.use((req, res, next) => {
+//   if (req.path === "/.env" || req.path.startsWith("/.")) {
+//     return res.status(403).send("Forbidden");
+//   }
+//   next();
+// });
 
 //Routes
 app.use("/prestige-hostel/v1/auth", authRoute);
