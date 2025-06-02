@@ -11,6 +11,7 @@ import {
   CheckCircle,
   MessageSquare,
   X,
+  Upload,
 } from "lucide-react";
 import Spinner from "../../components/Spinner";
 
@@ -24,9 +25,12 @@ function Advertisements() {
     adDescription: "",
     productCategory: "",
     durationDays: "",
+    image: "",
   });
   const [showModal, setShowModal] = useState(false);
   const [selectedAd, setSelectedAd] = useState(null);
+  const [fileName, setFileName] = useState("Choose an image...");
+  const [imagePreview, setImagePreview] = useState(null);
 
   const productCategories = [
     "Electronics",
@@ -44,6 +48,7 @@ function Advertisements() {
     "Kitchenware",
     "Health & Wellness",
     "Pet Supplies",
+    "Other",
   ];
 
   // Fetch All Advertisements
@@ -90,11 +95,25 @@ function Advertisements() {
     setLoading(true);
     setError("");
 
+    const formPayload = new FormData();
+    formPayload.append("adTitle", formData.adTitle);
+    formPayload.append("adDescription", formData.adDescription);
+    formPayload.append("productCategory", formData.productCategory);
+    formPayload.append("durationDays", formData.durationDays);
+    if (formData.image) {
+      formPayload.append("image", formData.image);
+    }
+
     try {
       const response = await axios.post(
         `${endpoint}/advertisements/post-advertisement`,
-        formData,
-        { withCredentials: true }
+        formPayload,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       toast.success(response.data.message || "Ad submitted successfully.");
       setFormData({
@@ -102,6 +121,7 @@ function Advertisements() {
         adDescription: "",
         productCategory: "",
         durationDays: "",
+        image: "",
       });
       setShowModal(false);
       await Promise.all([fetchAds(), fetchMyAds()]);
@@ -121,39 +141,52 @@ function Advertisements() {
     setSelectedAd(null);
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setFileName(file.name);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setFileName("Choose an image...");
+      setImagePreview(null);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-burgundy-100 to-burgundy-200 animate-fadeIn">
       <Navbar />
-      <main className="flex-grow max-w-7xl mx-auto p-6 md:p-10">
-        <header className="mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-burgundy-800 animate-slideIn">
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10">
+        <header className="mb-6 sm:mb-8">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-burgundy-800 animate-slideIn">
             Advertisements
           </h1>
-          <p className="text-lg text-gray-600 mt-2">
+          <p className="text-base sm:text-lg text-gray-600 mt-2">
             Discover and share products or services with our community.
           </p>
         </header>
 
-        {/* My Ads and Post an Ad Sections (Side by Side) */}
-        <div className="flex flex-col lg:flex-row gap-8 mb-10">
+        {/* My Ads and Post an Ad Sections */}
+        <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 mb-8 sm:mb-10">
           {/* My Advertisements Section */}
           <section
-            className="lg:w-2/3 bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
+            className="w-full lg:w-2/3 bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 animate-slideUp"
             style={{ animationDelay: "0.1s" }}
           >
-            <h2 className="text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
-              <Tag size={32} /> My Advertisements
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+              <Tag size={24} className="w-6 h-6 sm:w-8 sm:h-8" /> My
+              Advertisements
             </h2>
             {loading ? (
               <div className="flex justify-center items-center h-40">
                 <Spinner />
               </div>
             ) : myAdvertisements.length === 0 ? (
-              <p className="text-gray-600 italic text-center">
+              <p className="text-gray-600 italic text-center text-sm sm:text-base">
                 You haven't posted any advertisements yet.
               </p>
             ) : (
-              <ul className="space-y-5 overflow-y-auto max-h-[40vh] pr-2 scrollbar-custom">
+              <ul className="space-y-4 sm:space-y-5 overflow-y-auto max-h-[50vh] sm:max-h-[40vh] pr-2 scrollbar-custom">
                 {myAdvertisements
                   .slice()
                   .sort(
@@ -163,38 +196,60 @@ function Advertisements() {
                   .map((ad, index) => (
                     <li
                       key={ad.ad_id}
-                      className="border border-gray-300 rounded-2xl p-5 transition-all duration-300 cursor-pointer animate-stagger"
+                      className="border border-gray-300 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 transition-all duration-300 cursor-pointer animate-stagger hover:bg-burgundy-50"
                       style={{ animationDelay: `${0.1 * index}s` }}
                       onClick={() => handleAdClick(ad)}
                     >
-                      <h3 className="text-xl font-semibold text-burgundy-800 mb-1">
-                        {ad.ad_title}
-                      </h3>
-                      <p className="text-gray-700 mb-2 line-clamp-2">
-                        {ad.ad_description}
-                      </p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 font-medium">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={16} />
-                          <span>
-                            {new Date(ad.submission_date).toLocaleDateString()}
-                          </span>
+                      {/* Image */}
+                      {ad.image && (
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-100">
+                          <img
+                            src={ad.image}
+                            alt={ad.ad_title}
+                            className="w-full h-full object-cover"
+                          />
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Tag size={16} />
-                          <span>{ad.product_category}</span>
-                        </div>
-                        <div
-                          className={`flex items-center gap-1 font-bold ${
-                            ad.approval_status === "Approved"
-                              ? "text-green-600"
-                              : ad.approval_status === "Pending"
-                              ? "text-blue-600"
-                              : "text-red-400"
-                          }`}
-                        >
-                          <CheckCircle size={16} />
-                          <span>{ad.approval_status}</span>
+                      )}
+
+                      {/* Details */}
+                      <div className="flex-1">
+                        <h3 className="text-lg sm:text-xl font-semibold text-burgundy-800 mb-1 truncate">
+                          {ad.ad_title}
+                        </h3>
+                        <p className="text-gray-700 mb-2 text-sm sm:text-base line-clamp-2">
+                          {ad.ad_description}
+                        </p>
+                        <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 font-medium">
+                          <div className="flex items-center gap-1">
+                            <Calendar
+                              size={14}
+                              className="w-4 h-4 sm:w-5 sm:h-5"
+                            />
+                            <span>
+                              {new Date(
+                                ad.submission_date
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Tag size={14} className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span>{ad.product_category}</span>
+                          </div>
+                          <div
+                            className={`flex items-center gap-1 font-bold ${
+                              ad.approval_status === "Approved"
+                                ? "text-green-600"
+                                : ad.approval_status === "Pending"
+                                ? "text-blue-600"
+                                : "text-red-400"
+                            }`}
+                          >
+                            <CheckCircle
+                              size={14}
+                              className="w-4 h-4 sm:w-5 sm:h-5"
+                            />
+                            <span>{ad.approval_status}</span>
+                          </div>
                         </div>
                       </div>
                     </li>
@@ -205,44 +260,48 @@ function Advertisements() {
 
           {/* Post an Ad Section */}
           <section
-            className="lg:w-1/3 bg-white rounded-3xl shadow-xl p-8 transition-transform hover:scale-[1.02] animate-slideUp"
+            className="w-full lg:w-1/3 bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 transition-transform hover:scale-[1.01] sm:hover:scale-[1.02] animate-slideUp"
             style={{ animationDelay: "0.2s" }}
           >
-            <h2 className="text-2xl font-extrabold text-burgundy-700 mb-4">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-burgundy-700 mb-3 sm:mb-4">
               Share Your Ad
             </h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">
               At Prestige, we value tenant engagement. Share your products or
               services by posting an advertisement below.
             </p>
             <button
-              className="w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2"
+              className="w-full bg-burgundy-500 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
               onClick={() => setShowModal(true)}
             >
-              <MessageSquare size={20} /> Post an Ad
+              <MessageSquare size={16} className="w-4 h-4 sm:w-5 sm:h-5" /> Post
+              an Ad
             </button>
           </section>
         </div>
 
         {/* All Advertisements Section */}
         <section
-          className="bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
+          className="bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 animate-slideUp"
           style={{ animationDelay: "0.3s" }}
         >
-          <h2 className="text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
-            <Tag size={32} /> All Advertisements
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
+            <Tag size={24} className="w-6 h-6 sm:w-8 sm:h-8" /> All
+            Advertisements
           </h2>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
+          {error && (
+            <p className="text-red-500 mb-4 text-sm sm:text-base">{error}</p>
+          )}
           {loading ? (
             <div className="flex justify-center items-center h-40">
               <Spinner />
             </div>
           ) : advertisements.length === 0 ? (
-            <p className="text-gray-600 italic text-center">
+            <p className="text-gray-600 italic text-center text-sm sm:text-base">
               No advertisements available.
             </p>
           ) : (
-            <ul className="space-y-5 overflow-y-auto max-h-[60vh] pr-2 scrollbar-custom">
+            <ul className="space-y-4 sm:space-y-5 overflow-y-auto max-h-[60vh] pr-2 scrollbar-custom">
               {advertisements
                 .slice()
                 .sort(
@@ -252,49 +311,72 @@ function Advertisements() {
                 .map((ad, index) => (
                   <li
                     key={ad.ad_id}
-                    className="border border-gray-300 rounded-2xl p-5 hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                    className="border border-gray-300 rounded-2xl p-4 sm:p-5 hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
                     style={{ animationDelay: `${0.1 * index}s` }}
                     onClick={() => handleAdClick(ad)}
                   >
-                    <h3 className="text-xl font-semibold text-burgundy-800 mb-1">
-                      {ad.ad_title}
-                    </h3>
-                    <p className="text-gray-700 mb-2 line-clamp-2">
-                      {ad.ad_description}
-                    </p>
-                    <div className="flex flex-wrap gap-4 text-sm text-gray-500 font-medium">
-                      <div className="flex items-center gap-1">
-                        <Calendar size={16} />
-                        <span>
-                          {new Date(ad.submission_date).toLocaleDateString()}
-                        </span>
+                    <div className="flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
+                      {/* Text content */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg sm:text-xl font-semibold text-burgundy-800 mb-1 truncate">
+                          {ad.ad_title}
+                        </h3>
+                        <p className="text-gray-700 mb-2 text-sm sm:text-base line-clamp-2">
+                          {ad.ad_description}
+                        </p>
+                        <div className="flex flex-wrap gap-3 sm:gap-4 text-xs sm:text-sm text-gray-500 font-medium">
+                          <div className="flex items-center gap-1">
+                            <Calendar
+                              size={14}
+                              className="w-4 h-4 sm:w-5 sm:h-5"
+                            />
+                            <span>
+                              {new Date(
+                                ad.submission_date
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Tag size={14} className="w-4 h-4 sm:w-5 sm:h-5" />
+                            <span>{ad.product_category}</span>
+                          </div>
+                          <div
+                            className={`flex items-center gap-1 font-bold ${
+                              ad.approval_status === "Approved"
+                                ? "text-green-600"
+                                : ad.approval_status === "Pending"
+                                ? "text-blue-600"
+                                : "text-red-400"
+                            }`}
+                          >
+                            <CheckCircle
+                              size={14}
+                              className="w-4 h-4 sm:w-5 sm:h-5"
+                            />
+                            <span>{ad.approval_status}</span>
+                          </div>
+                        </div>
+                        <div className="mt-3 sm:mt-4 text-sm sm:text-base text-gray-600 space-y-1">
+                          <p className="font-bold text-burgundy-700">
+                            Contact Details:
+                          </p>
+                          {ad.contact_details.split("|").map((part, i) => (
+                            <p key={i}>{part.trim()}</p>
+                          ))}
+                        </div>
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Tag size={16} />
-                        <span>{ad.product_category}</span>
-                      </div>
-                      <div
-                        className={`flex items-center gap-1 font-bold ${
-                          ad.approval_status === "Approved"
-                            ? "text-green-600"
-                            : ad.approval_status === "Pending"
-                            ? "text-blue-600"
-                            : "text-red-400"
-                        }`}
-                      >
-                        <CheckCircle size={16} />
-                        <span>{ad.approval_status}</span>
-                      </div>
+
+                      {/* Image */}
+                      {ad.image && (
+                        <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-100">
+                          <img
+                            src={ad.image}
+                            alt={ad.ad_title}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      )}
                     </div>
-                    <button
-                      className="mt-4 flex items-center gap-2 bg-burgundy-500 text-white px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-colors"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.location.href = `tel:${ad.contact_details}`;
-                      }}
-                    >
-                      <Phone size={16} /> Contact Now
-                    </button>
                   </li>
                 ))}
             </ul>
@@ -304,14 +386,14 @@ function Advertisements() {
         {/* Post Advertisement Modal */}
         {showModal && (
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 max-w-md w-full mx-4 relative animate-slideUp max-h-[90vh] overflow-y-auto scrollbar-custom">
               <button
-                className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
+                className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowModal(false)}
               >
-                <X size={24} />
+                <X size={20} className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
-              <h2 className="text-2xl font-bold text-burgundy-800 mb-4">
+              <h2 className="text-xl sm:text-2xl font-bold text-burgundy-800 mb-3 sm:mb-4">
                 Post an Advertisement
               </h2>
               {loading ? (
@@ -331,7 +413,7 @@ function Advertisements() {
                         setFormData({ ...formData, adTitle: e.target.value })
                       }
                       placeholder="Enter ad title"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       required
                     />
                   </div>
@@ -348,7 +430,7 @@ function Advertisements() {
                         })
                       }
                       placeholder="Describe your ad"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       rows="4"
                       required
                     />
@@ -365,7 +447,7 @@ function Advertisements() {
                           productCategory: e.target.value,
                         })
                       }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       required
                     >
                       <option value="" className="text-gray-700">
@@ -378,6 +460,42 @@ function Advertisements() {
                       ))}
                     </select>
                   </div>
+
+                  <div className="relative">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Upload Image
+                    </label>
+                    <div className="flex items-center">
+                      <label
+                        htmlFor="file-upload"
+                        className="flex items-center w-full p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                      >
+                        <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 mr-2" />
+                        <span className="text-gray-500 truncate text-sm sm:text-base">
+                          {fileName}
+                        </span>
+                        <input
+                          id="file-upload"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </label>
+                    </div>
+
+                    {/* Preview */}
+                    {imagePreview && (
+                      <div className="mt-3 sm:mt-4">
+                        <img
+                          src={imagePreview}
+                          alt="Preview"
+                          className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border border-gray-300"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Duration (days)
@@ -392,7 +510,7 @@ function Advertisements() {
                         })
                       }
                       placeholder="Enter duration"
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       min="1"
                       required
                     />
@@ -402,14 +520,14 @@ function Advertisements() {
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="bg-gray-400 text-white py-2 px-4 rounded-lg hover:bg-gray-500 transition-colors"
+                      className="bg-gray-400 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-gray-500 transition-colors text-sm sm:text-base"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`bg-burgundy-500 text-white py-2 px-4 rounded-lg hover:bg-burgundy-600 transition-colors ${
+                      className={`bg-burgundy-500 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-burgundy-600 transition-colors text-sm sm:text-base ${
                         loading ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
@@ -425,17 +543,30 @@ function Advertisements() {
         {/* Advertisement Details Modal */}
         {selectedAd && (
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+            <div className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 max-w-md w-full mx-4 relative animate-slideUp max-h-[90vh] overflow-y-auto scrollbar-custom">
               <button
-                className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
+                className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={closeModal}
               >
-                <X size={24} />
+                <X size={20} className="w-5 h-5 sm:w-6 sm:h-6" />
               </button>
-              <h3 className="text-2xl font-bold text-burgundy-800 mb-4">
+
+              <h3 className="text-xl sm:text-2xl font-bold text-burgundy-800 mb-3 sm:mb-4">
                 {selectedAd.ad_title}
               </h3>
-              <div className="space-y-2 text-gray-600">
+
+              {/* Image Section */}
+              {selectedAd.image && (
+                <div className="mb-4 sm:mb-6 rounded-lg overflow-hidden border border-gray-100">
+                  <img
+                    src={selectedAd.image}
+                    alt={selectedAd.ad_title}
+                    className="w-full object-contain max-h-48 sm:max-h-64"
+                  />
+                </div>
+              )}
+
+              <div className="space-y-2 text-gray-600 text-sm sm:text-base">
                 <p>
                   <strong>Description:</strong> {selectedAd.ad_description}
                 </p>
@@ -456,8 +587,9 @@ function Advertisements() {
                   <strong>Status:</strong> {selectedAd.approval_status}
                 </p>
               </div>
+
               <button
-                className="mt-6 w-full bg-burgundy-500 text-white px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-colors"
+                className="mt-4 sm:mt-6 w-full bg-burgundy-500 text-white px-4 py-2 sm:py-3 rounded-lg hover:bg-burgundy-600 transition-colors text-sm sm:text-base"
                 onClick={() =>
                   (window.location.href = `tel:${selectedAd.contact_details}`)
                 }

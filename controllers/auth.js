@@ -156,11 +156,11 @@ const signInTenant = async (req, res) => {
       { expiresIn: "24h" }
     );
 
-    // Set cookie
+    //Set the cookie
     res.cookie("tenantPrestigeSession", tenantToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
 
@@ -310,7 +310,7 @@ const signInAdmin = async (req, res) => {
     res.cookie("adminPrestigeSession", adminToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "None",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 24 * 60 * 60 * 1000,
     });
 

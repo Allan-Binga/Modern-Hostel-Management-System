@@ -148,12 +148,6 @@ function TenantHome() {
     }
   };
 
-  const filteredRooms = roomFilter
-    ? rooms.filter(
-        (room) => room.roomtype === roomFilter || room.status === roomFilter
-      )
-    : rooms;
-
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-burgundy-100 to-burgundy-200 animate-fadeIn">
       <Navbar />
@@ -277,8 +271,8 @@ function TenantHome() {
                   </div>
                 </div>
               ) : (
-                <p className="italic text-gray-500">
-                  No room details available.
+                <p className="italic text-gray-500 text-center font-semibold">
+                  Please book a room to explore this section
                 </p>
               )
             ) : (
@@ -314,64 +308,85 @@ function TenantHome() {
                   .map((ad, index) => (
                     <li
                       key={ad.ad_id}
-                      className="border border-gray-300 rounded-2xl p-5 0 transition-all duration-300 cursor-pointer animate-stagger"
+                      className="border border-gray-300 rounded-2xl p-5 transition-all duration-300 cursor-pointer animate-stagger"
                       style={{ animationDelay: `${0.1 * index}s` }}
                       onClick={() => handleAdClick(ad)}
                     >
-                      {ad.image && (
-                        <img
-                          src={ad.image}
-                          alt={ad.ad_title}
-                          className="w-full h-32 object-cover rounded-lg mb-4"
-                        />
-                      )}
-                      <h3 className="text-xl font-semibold text-burgundy-800 mb-1">
-                        {ad.ad_title}
-                      </h3>
-                      <p className="text-gray-700 mb-2 line-clamp-2">
-                        {ad.ad_description}
-                      </p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500 font-medium">
-                        <div className="flex items-center gap-1">
-                          <Calendar size={16} />
-                          <span>
-                            {new Date(ad.submission_date).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Tag size={16} />
-                          <span>{ad.product_category}</span>
-                        </div>
-                        <div className="flex items-center gap-1 font-bold">
-                          <CheckCircle
-                            size={16}
-                            className={
-                              ad.approval_status === "Approved"
-                                ? "text-green-600"
-                                : "text-blue-600"
-                            }
-                          />
-                          <span
-                            className={
-                              ad.approval_status === "Approved"
-                                ? "text-green-600"
-                                : "text-blue-600"
-                            }
+                      <div className="flex items-start gap-6">
+                        {/* Text content (left) */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-xl font-semibold text-burgundy-800 mb-1 truncate">
+                            {ad.ad_title}
+                          </h3>
+                          <p className="text-gray-700 mb-2 line-clamp-2">
+                            {ad.ad_description}
+                          </p>
+                          <div className="flex flex-wrap gap-4 text-sm text-gray-500 font-medium">
+                            <div className="flex items-center gap-1">
+                              <Calendar size={16} />
+                              <span>
+                                {new Date(
+                                  ad.submission_date
+                                ).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <Tag size={16} />
+                              <span>{ad.product_category}</span>
+                            </div>
+                            <div className="flex items-center gap-1 font-bold">
+                              <CheckCircle
+                                size={16}
+                                className={
+                                  ad.approval_status === "Approved"
+                                    ? "text-green-600"
+                                    : "text-blue-600"
+                                }
+                              />
+                              <span
+                                className={
+                                  ad.approval_status === "Approved"
+                                    ? "text-green-600"
+                                    : "text-blue-600"
+                                }
+                              >
+                                {ad.approval_status}
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            className="mt-4 flex items-center gap-2 bg-burgundy-500 text-white px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-colors"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const phoneMatch =
+                                ad.contact_details.match(/Phone:\s*(\d{7,15})/);
+                              const phoneNumber = phoneMatch
+                                ? phoneMatch[1]
+                                : null;
+
+                              if (phoneNumber) {
+                                window.location.href = `tel:${phoneNumber}`;
+                                toast.info("Initiating call...");
+                              } else {
+                                toast.error("Phone number not found.");
+                              }
+                            }}
                           >
-                            {ad.approval_status}
-                          </span>
+                            <Phone size={16} /> Contact Now
+                          </button>
                         </div>
+
+                        {/* Image (right) */}
+                        {ad.image && (
+                          <div className="w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 border border-gray-50">
+                            <img
+                              src={ad.image}
+                              alt={ad.ad_title}
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
                       </div>
-                      <button
-                        className="mt-4 flex items-center gap-2 bg-burgundy-500 text-white px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-colors"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.location.href = `tel:${ad.contact_details}`;
-                          toast.info("Initiating call...");
-                        }}
-                      >
-                        <Phone size={16} /> Contact Now
-                      </button>
                     </li>
                   ))}
               </ul>
@@ -385,29 +400,14 @@ function TenantHome() {
             <h2 className="text-3xl font-extrabold text-burgundy-800 flex items-center gap-3">
               <Bed size={36} /> Available Rooms
             </h2>
-            <select
-              value={roomFilter}
-              onChange={(e) => setRoomFilter(e.target.value)}
-              className="p-2 border border-pink-950 text-pink-950 rounded-lg  focus:ring-1 focus:ring-pink-950 focus:border-gray-300 focus:outline-none"
-            >
-              <option value="">All Rooms</option>
-              <option value="Single">Single</option>
-              <option value="Double">Double</option>
-              <option value="AVAILABLE">Available</option>
-              <option value="OCCUPIED">Occupied</option>
-            </select>
           </div>
           {loading ? (
             <div className="absolute inset-0 flex justify-center items-center bg-white bg-opacity-80 transition-opacity duration-300">
               <Spinner size="large" />
             </div>
-          ) : filteredRooms.length === 0 ? (
-            <p className="text-gray-600 italic">
-              No rooms available at the moment.
-            </p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-              {filteredRooms.map((room, index) => (
+              {rooms.map((room, index) => (
                 <div
                   key={room.roomid}
                   className="bg-white rounded-3xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02] animate-slideUp"
@@ -465,20 +465,22 @@ function TenantHome() {
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
             <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
-                className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
+                className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700 cursor-pointer"
                 onClick={closeModal}
               >
-                ✕
+                <X />
               </button>
               <h3 className="text-2xl font-bold text-burgundy-800 mb-4">
                 {selectedAd.ad_title}
               </h3>
               {selectedAd.image && (
-                <img
-                  src={selectedAd.image}
-                  alt={selectedAd.ad_title}
-                  className="w-full h-40 object-cover rounded-lg mb-4"
-                />
+                <div className="mb-4 sm:mb-6 rounded-lg overflow-hidden border border-gray-100">
+                  <img
+                    src={selectedAd.image}
+                    alt={selectedAd.ad_title}
+                    className="w-full object-contain max-h-48 sm:max-h-64"
+                  />
+                </div>
               )}
               <p className="text-gray-700 mb-4">{selectedAd.ad_description}</p>
               <div className="space-y-2 text-gray-600">
@@ -509,13 +511,21 @@ function TenantHome() {
                 </p>
               </div>
               <button
-                className="mt-6 w-full bg-burgundy-500 text-white px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-colors"
-                onClick={() => {
-                  window.location.href = `tel:${selectedAd.contact_details}`;
-                  toast.info("Initiating call...");
+                className="mt-4 flex items-center gap-2 bg-burgundy-500 text-white px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-colors cursor-pointer"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const phoneMatch =
+                    ad.contact_details.match(/Phone:\s*(\d{7,15})/);
+                  const phoneNumber = phoneMatch ? phoneMatch[1] : null;
+
+                  if (phoneNumber) {
+                    window.location.href = `tel:${phoneNumber}`;
+                  } else {
+                    toast.error("Phone number not found.");
+                  }
                 }}
               >
-                Contact Now
+                <Phone size={16} /> Contact Now
               </button>
             </div>
           </div>

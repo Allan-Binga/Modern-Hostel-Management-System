@@ -5,15 +5,43 @@ import { toast } from "react-toastify";
 import AdminNavbar from "../../components/AdminNavbar";
 import Footer from "../../components/Footer";
 import Spinner from "../../components/Spinner";
-import { Bed, Tag, Clock, BanknoteArrowUp, Filter, X } from "lucide-react";
+import {
+  Bed,
+  Tag,
+  Clock,
+  BanknoteArrowUp,
+  Filter,
+  X,
+  PlusSquare,
+  Upload,
+} from "lucide-react";
 
 function AdministratorHome() {
   const [rooms, setRooms] = useState([]);
   const [roomFilter, setRoomFilter] = useState("");
   const [loading, setLoading] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const [addRoomModal, setAddRoomModal] = useState(false);
+  const [updateModal, setUpdateModal] = useState(false);
+  const [fileName, setFileName] = useState("Choose an image");
+  const [imagePreview, setImagePreview] = useState(null);
+  const [formData, setFormData] = useState({
+    room_type: "",
+    beds: "",
+    price: "",
+    image: "",
+  });
   const modalRef = useRef(null);
   const firstFocusableRef = useRef(null);
+
+  const getRooms = async () => {
+    try {
+      const response = await axios.get(`${endpoint}/rooms/all-rooms`);
+      return response.data;
+    } catch (error) {
+      throw error.response.data.message;
+    }
+  };
 
   // Fetch rooms
   useEffect(() => {
@@ -89,6 +117,75 @@ function AdministratorHome() {
       )
     : rooms;
 
+  const handleAddRoomClick = () => {
+    setAddRoomModal(true);
+    setFormData({
+      room_type: "",
+      beds: "",
+      price: "",
+      image: "",
+    });
+  };
+
+  const createRoom = async () => {
+    const formPayload = new FormData();
+    formPayload.append("room_type", formData.room_type);
+    formPayload.append("beds", formData.beds);
+    formPayload.append("price", formData.price);
+    if (formData.image) {
+      formPayload.append("image", formData.image);
+    }
+    try {
+      const response = await axios.post(
+        `${endpoint}/rooms/create-a-room`,
+        formPayload,
+        {
+          withCredentials: true,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setAddRoomModal(false);
+      const updatedRooms = await getRooms();
+      setRooms(updatedRooms);
+      toast.success("Room added successfully.");
+    } catch (error) {
+      console.error("Error in room:", {
+        message: error.message,
+        response: error.response?.data,
+      });
+      toast.error("Failed to add room.");
+    }
+  };
+
+  const updateRoom = async () => {
+    try {
+      await axios.put(
+        `${endpoint}/rooms/update-room/${selectedRoom.roomid}`,
+        formData
+      );
+      setUpdateModal(false);
+      const updatedRooms = await getRooms();
+      setRooms(updatedRooms);
+      toast.success("Listing updated successfully.");
+    } catch (error) {
+      console.error("Error updating room:", error);
+      toast.error("Failed to update room.");
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData({ ...formData, image: file });
+      setFileName(file.name);
+      setImagePreview(URL.createObjectURL(file));
+    } else {
+      setFileName("Choose an image");
+      setImagePreview(null);
+    }
+  };
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-burgundy-100 to-burgundy-200">
       <AdminNavbar />
@@ -102,7 +199,7 @@ function AdministratorHome() {
             Manage rooms and view availability
           </p>
         </header>
-       
+
         {/* Available Rooms */}
         <section
           className="mt-12 relative min-h-[400px]"
@@ -113,23 +210,15 @@ function AdministratorHome() {
             <h2 className="text-2xl sm:text-3xl font-semibold text-burgundy-800 flex items-center gap-3">
               <Bed size={28} /> Rooms
             </h2>
+            {/* Add Room Button */}
             <div className="relative w-full sm:w-auto">
-              <Filter
-                size={20}
-                className="absolute left-3 top-1/2 transform -translate-y-1/2 text-burgundy-600"
-              />
-              <select
-                value={roomFilter}
-                onChange={(e) => setRoomFilter(e.target.value)}
-                className="w-full sm:w-48 pl-10 pr-4 py-2 bg-burgundy-100 text-burgundy-800 border border-burgundy-400 rounded-lg focus:ring-2 focus:ring-burgundy-500 focus:border-burgundy-500 focus:outline-none transition-all"
-                aria-label="Filter rooms by type or status"
+              <button
+                className="bg-burgundy-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg hover:bg-burgundy-600 transition text-sm sm:text-base cursor-pointer"
+                onClick={handleAddRoomClick}
               >
-                <option value="">All Rooms</option>
-                <option value="Single">Single</option>
-                <option value="Double">Double</option>
-                <option value="AVAILABLE">Available</option>
-                <option value="OCCUPIED">Occupied</option>
-              </select>
+                <PlusSquare className="w-5 h-5" />
+                Add a Room
+              </button>
             </div>
           </div>
 
@@ -202,7 +291,7 @@ function AdministratorHome() {
       {/* Modal for Room Details */}
       {selectedRoom && (
         <div
-          className="fixed inset-0 bg-burgundy-900/50 flex items-center justify-center z-50 transition-opacity duration-300"
+          className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 transition-opacity duration-300"
           onClick={handleClickOutside}
         >
           <div
@@ -280,7 +369,122 @@ function AdministratorHome() {
         </div>
       )}
 
-     
+      {/*Add Room Modal*/}
+      {addRoomModal && (
+        <div
+          className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center px-4"
+          onClick={handleClickOutside}
+        >
+          <div
+            ref={modalRef}
+            className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-semibold text-burgundy-800">
+                Add a New Room
+              </h3>
+              <button
+                onClick={() => setAddRoomModal(false)}
+                className="text-burgundy-600 hover:text-burgundy-800"
+                aria-label="Close add room modal"
+              >
+                <X size={24} />
+              </button>
+            </div>
+
+            {/* Room Type */}
+            <div>
+              <label className="block text-sm font-medium text-burgundy-700">
+                Room Type
+              </label>
+              <input
+                type="text"
+                value={formData.room_type}
+                onChange={(e) =>
+                  setFormData({ ...formData, room_type: e.target.value })
+                }
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-200 focus:border-gray-200"
+                placeholder="Shared/Single"
+              />
+            </div>
+
+            {/* Beds */}
+            <div>
+              <label className="block text-sm font-medium text-burgundy-700">
+                Number of Beds
+              </label>
+              <input
+                type="number"
+                value={formData.beds}
+                onChange={(e) =>
+                  setFormData({ ...formData, beds: e.target.value })
+                }
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-400 focus:border-gray-500"
+                min={1}
+              />
+            </div>
+
+            {/* Price */}
+            <div>
+              <label className="block text-sm font-medium text-burgundy-700">
+                Price (KES)
+              </label>
+              <input
+                type="number"
+                value={formData.price}
+                onChange={(e) =>
+                  setFormData({ ...formData, price: e.target.value })
+                }
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-400 focus:border-gray-500"
+              />
+            </div>
+
+            {/* Image Upload */}
+            <div>
+              <label className="block text-sm font-medium text-burgundy-700 mb-1">
+                Room Image
+              </label>
+              <div className="flex items-center gap-3">
+                <label className="flex items-center gap-2 bg-burgundy-100 text-burgundy-800 px-3 py-2 rounded-lg cursor-pointer hover:bg-burgundy-200">
+                  <Upload size={18} />
+                  <span>{fileName}</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+                </label>
+                {imagePreview && (
+                  <img
+                    src={imagePreview}
+                    alt="Preview"
+                    className="h-16 w-24 object-cover rounded"
+                  />
+                )}
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="flex justify-end gap-3 mt-6">
+              <button
+                onClick={() => setAddRoomModal(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={createRoom}
+                className="px-5 py-2 text-sm font-semibold bg-burgundy-500 text-white rounded hover:bg-burgundy-600 transition cursor-pointer"
+              >
+                Add Room
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );

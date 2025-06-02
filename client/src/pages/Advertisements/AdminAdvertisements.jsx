@@ -52,7 +52,8 @@ function AdminAdvertisements() {
       }
     };
 
-    if (selectedAd && firstFocusableRef.current) firstFocusableRef.current.focus();
+    if (selectedAd && firstFocusableRef.current)
+      firstFocusableRef.current.focus();
     document.addEventListener("keydown", handleKeyDown);
     document.addEventListener("keydown", handleFocusTrap);
     return () => {
@@ -62,7 +63,8 @@ function AdminAdvertisements() {
   }, [selectedAd]);
 
   const handleClickOutside = (e) => {
-    if (modalRef.current && !modalRef.current.contains(e.target)) setSelectedAd(null);
+    if (modalRef.current && !modalRef.current.contains(e.target))
+      setSelectedAd(null);
   };
 
   const formatDate = (isoString) => {
@@ -70,7 +72,11 @@ function AdminAdvertisements() {
       const date = new Date(isoString);
       return isNaN(date.getTime())
         ? "Invalid Date"
-        : date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+        : date.toLocaleDateString("en-GB", {
+            day: "numeric",
+            month: "short",
+            year: "numeric",
+          });
     } catch {
       return "Invalid Date";
     }
@@ -84,10 +90,12 @@ function AdminAdvertisements() {
         {},
         { withCredentials: true }
       );
-      toast.success(`Advertisement #${selectedAd.ad_id} approved.`);
+      toast.success("Advertisement approved.");
       setAdvertisements((prev) =>
         prev.map((ad) =>
-          ad.ad_id === selectedAd.ad_id ? { ...ad, approval_status: "Approved" } : ad
+          ad.ad_id === selectedAd.ad_id
+            ? { ...ad, approval_status: "Approved" }
+            : ad
         )
       );
       setSelectedAd({ ...selectedAd, approval_status: "Approved" });
@@ -109,7 +117,9 @@ function AdminAdvertisements() {
       toast.success(`Advertisement #${selectedAd.ad_id} rejected.`);
       setAdvertisements((prev) =>
         prev.map((ad) =>
-          ad.ad_id === selectedAd.ad_id ? { ...ad, approval_status: "Rejected" } : ad
+          ad.ad_id === selectedAd.ad_id
+            ? { ...ad, approval_status: "Rejected" }
+            : ad
         )
       );
       setSelectedAd({ ...selectedAd, approval_status: "Rejected" });
@@ -125,11 +135,19 @@ function AdminAdvertisements() {
       <AdminNavbar />
       <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
         <header className="mb-8 animate-fadeIn">
-          <h1 className="text-3xl sm:text-4xl font-bold text-burgundy-800">Advertisements</h1>
-          <p className="text-base sm:text-lg text-burgundy-600 mt-2">Manage advertisement requests</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-burgundy-800">
+            Advertisements
+          </h1>
+          <p className="text-base sm:text-lg text-burgundy-600 mt-2">
+            Manage advertisement requests
+          </p>
         </header>
 
-        <section className="relative min-h-[200px]" aria-live="polite" aria-busy={loading}>
+        <section
+          className="relative min-h-[200px]"
+          aria-live="polite"
+          aria-busy={loading}
+        >
           <h2 className="text-2xl font-semibold text-burgundy-800 flex items-center gap-3 mb-6">
             <Tag size={28} className="text-burgundy-600" /> All Advertisements
           </h2>
@@ -138,20 +156,34 @@ function AdminAdvertisements() {
               <Spinner size="large" className="text-burgundy-500" />
             </div>
           ) : advertisements.length === 0 ? (
-            <p className="text-burgundy-600 text-base italic">No advertisements available.</p>
+            <p className="text-burgundy-600 text-base italic">
+              No advertisements available.
+            </p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {advertisements.map((ad, index) => (
                 <div
                   key={ad.ad_id}
-                  className="bg-white rounded-lg shadow-sm min-h-[260px] transition-transform hover:scale-105 animate-slideUp"
+                  className="bg-white rounded-lg shadow-sm min-h-[260px] w-full max-w-[420px] mx-auto transition-transform hover:scale-105 animate-slideUp"
                   style={{ animationDelay: `${0.1 * index}s` }}
                 >
-                  <div className="p-8 space-y-3 text-burgundy-800">
+                  <div className="p-10 space-y-4 text-burgundy-800">
+                    {ad.image && (
+                      <div className="w-56 h-56 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-100 mx-auto">
+                        <img
+                          src={ad.image}
+                          alt={ad.ad_title}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                    )}
+
                     <div className="flex items-center justify-between">
-                      <div className="text-lg font-semibold truncate">{ad.ad_title}</div>
+                      <div className="text-xl font-semibold truncate">
+                        {ad.ad_title}
+                      </div>
                       <span
-                        className={`text-sm px-2 py-1 rounded-lg ${
+                        className={`text-sm px-3 py-1 rounded-lg ${
                           ad.approval_status === "Pending"
                             ? "bg-yellow-100 text-yellow-800"
                             : ad.approval_status === "Approved"
@@ -173,7 +205,7 @@ function AdminAdvertisements() {
                     </div>
                     <button
                       onClick={() => setSelectedAd(ad)}
-                      className="w-full mt-4 bg-burgundy-500 text-burgundy-100 py-2 rounded-lg hover:bg-burgundy-600 transition-all focus:outline-none focus:ring-2 focus:ring-burgundy-400"
+                      className="w-full mt-4 bg-burgundy-500 text-burgundy-100 py-3 rounded-lg hover:bg-burgundy-600 transition-all focus:outline-none focus:ring-2 focus:ring-burgundy-400"
                       aria-label={`View details for advertisement ${ad.ad_id}`}
                     >
                       View Details
@@ -187,7 +219,7 @@ function AdminAdvertisements() {
 
         {selectedAd && (
           <div
-            className="fixed inset-0 bg-burgundy-900/50 flex items-center justify-center z-50 transition-opacity"
+            className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 transition-opacity"
             onClick={handleClickOutside}
           >
             <div
@@ -198,8 +230,12 @@ function AdminAdvertisements() {
               aria-labelledby="modal-title"
             >
               <div className="flex justify-between items-center mb-4">
-                <h3 id="modal-title" className="text-xl font-semibold text-burgundy-800 flex items-center gap-2">
-                  <Tag size={20} className="text-burgundy-600" /> {selectedAd.ad_title}
+                <h3
+                  id="modal-title"
+                  className="text-xl font-semibold text-burgundy-800 flex items-center gap-2"
+                >
+                  <Tag size={20} className="text-burgundy-600" />{" "}
+                  {selectedAd.ad_title}
                 </h3>
                 <button
                   ref={firstFocusableRef}
@@ -211,6 +247,15 @@ function AdminAdvertisements() {
                 </button>
               </div>
               <div className="space-y-3 text-burgundy-800">
+                {selectedAd.image && (
+                  <div className="mb-4 sm:mb-6 rounded-lg overflow-hidden border border-gray-100">
+                    <img
+                      src={selectedAd.image}
+                      alt={selectedAd.ad_title}
+                      className="w-full object-contain max-h-48 sm:max-h-64"
+                    />
+                  </div>
+                )}
                 <div className="text-base">{selectedAd.ad_description}</div>
                 <div className="flex items-center gap-2 text-base">
                   <Tag size={20} className="text-burgundy-600" />

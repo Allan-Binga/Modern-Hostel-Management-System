@@ -30,6 +30,7 @@ const postAdvertisement = async (req, res) => {
   try {
     const tenantId = req.tenantId; // Use tenantId from middleware
     const { adTitle, adDescription, productCategory, durationDays } = req.body;
+    const image = req.file?.location || null;
 
     // Validate required fields
     if (!adTitle || !adDescription || !productCategory || !durationDays) {
@@ -65,8 +66,8 @@ const postAdvertisement = async (req, res) => {
 
     // Insert the advertisement into the database
     const query = `
-        INSERT INTO advertisements (tenant_id, ad_title, ad_description, product_category, contact_details, duration_days, approval_status)
-        VALUES ($1, $2, $3, $4, $5, $6, 'Pending')
+        INSERT INTO advertisements (tenant_id, ad_title, ad_description, product_category, contact_details, duration_days, image, approval_status)
+        VALUES ($1, $2, $3, $4, $5, $6, $7,'Pending')
         RETURNING ad_id, ad_title, product_category, approval_status;
       `;
     const values = [
@@ -76,6 +77,7 @@ const postAdvertisement = async (req, res) => {
       productCategory,
       contactDetails,
       durationDays,
+      image,
     ];
 
     const result = await client.query(query, values);
@@ -105,6 +107,7 @@ const postAdvertisement = async (req, res) => {
 const approveAdvertisement = async (req, res) => {
   try {
     const { adId } = req.params;
+    // console.log(adId)
 
     // Check if the advertisement exists
     const adQuery = `
@@ -119,6 +122,7 @@ const approveAdvertisement = async (req, res) => {
     }
 
     const advertisement = adResult.rows[0];
+    // console.log(advertisement)
 
     // Ensure the advertisement is not already approved
     if (advertisement.approval_status === "Approved") {
