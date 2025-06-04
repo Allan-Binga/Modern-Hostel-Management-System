@@ -112,8 +112,8 @@ function Bookings() {
       <main className="flex-grow px-4 py-8 max-w-7xl mx-auto">
         {/* Hero Header */}
         <header className="mb-8 animate-fadeIn">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-burgundy-800 animate-slideIn">
-            My Booking
+          <h1 className="text-4xl md:text-5xl font-bold text-burgundy-800 animate-slideIn">
+            Payments & Bookings
           </h1>
           <p className="text-lg text-gray-600 mt-2">
             View your bookings and manage your rent payments.
@@ -123,7 +123,7 @@ function Bookings() {
         {/* Pay Rent Section */}
         {/* Pay Rent Section */}
         <section className="mb-12 bg-white rounded-3xl shadow-xl p-8 animate-slideUp">
-          <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-burgundy-700 mb-6 flex items-center gap-3">
             <BanknoteArrowUp size={28} /> Pay Rent
           </h2>
 
@@ -171,18 +171,10 @@ function Bookings() {
         {/* Bookings Section */}
         <section>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-extrabold text-burgundy-800 flex items-center gap-3">
+            <h2 className="text-3xl font-bold text-burgundy-800 flex items-center gap-3">
               <History size={36} /> My Bookings
             </h2>
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="p-2 border border-burgundy-300 rounded-lg focus:ring-1 focus:ring-pink-950 focus:border-gray-300 focus:outline-none"
-            >
-              <option value="">All Bookings</option>
-              <option value="Paid">Paid</option>
-              <option value="Unpaid">Unpaid</option>
-            </select>
+           
           </div>
 
           {loading ? (
@@ -286,8 +278,8 @@ function Bookings() {
 
         {/* Payments Section */}
         <section className="mt-12">
-          <h2 className="text-3xl font-extrabold text-burgundy-800 flex items-center gap-3 mb-6">
-            <BanknoteArrowUp size={30} /> My Payments
+          <h2 className="text-3xl font-bold text-burgundy-800 flex items-center gap-3 mb-6">
+            <BanknoteArrowUp size={30} /> Recent Payments
           </h2>
 
           {loading ? (

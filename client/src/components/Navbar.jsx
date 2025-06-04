@@ -8,7 +8,6 @@ import {
   BadgeAlert,
   CircleUser,
   ChevronDown,
-  User,
   Settings,
   Mail,
   LogOutIcon,
@@ -28,6 +27,7 @@ function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Fetch notifications on mount
   useEffect(() => {
     axios
       .get(`${endpoint}/notifications/my-notifications`, {
@@ -37,6 +37,7 @@ function Navbar() {
       .catch((err) => console.error("Failed to fetch notifications:", err));
   }, []);
 
+  // Handle logout
   const handleLogout = async () => {
     try {
       const response = await axios.post(
@@ -44,12 +45,11 @@ function Navbar() {
         {},
         { withCredentials: true }
       );
-
       if (response.status === 200) {
         document.cookie = "tenantPrestigeSession=; Max-Age=0; path=/;";
         localStorage.removeItem("tenantId");
         toast.success("Successfully logged out.");
-        setTimeout(() => navigate("/login"), 4000);
+        setTimeout(() => navigate("/login"), 2000); // Reduced timeout for faster UX
       } else {
         toast.error("You are not logged in.");
       }
@@ -59,9 +59,11 @@ function Navbar() {
     }
   };
 
-  const toggleDropdown = () => setIsDropdownOpen(!isDropdownOpen);
-  const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
+  // Toggle dropdown and mobile menu
+  const toggleDropdown = () => setIsDropdownOpen((prev) => !prev);
+  const toggleMobileMenu = () => setIsMobileMenuOpen((prev) => !prev);
 
+  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -72,159 +74,165 @@ function Navbar() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Navigation items array for DRY code
+  const navItems = [
+    { to: "/home", icon: Home, label: "Home" },
+    { to: "/visitors", icon: UserPlus, label: "Visitors" },
+    { to: "/bookings", icon: WalletCards, label: "Rent & Booking" },
+    { to: "/issue-reports", icon: BadgeAlert, label: "Issue Reports" },
+    { to: "/advertisements", icon: Megaphone, label: "Advertisements" },
+  ];
+
+  // Check active route
   const isActive = (path) => location.pathname === path;
 
   return (
-    <nav className="relative px-4 py-4 flex justify-between items-center bg-burgundy-600 shadow-md">
-      {/* Logo */}
-      <a href="/home" className="flex items-center space-x-2">
-        <img src={Logo} alt="Prestige Logo" className="h-10 w-auto" />
-        <span className="text-white text-2xl font-semibold select-none hidden lg:inline">
-          Hostel Management System
-        </span>
-      </a>
-
-      {/* Burger Icon (Mobile) */}
-      <button
-        className="lg:hidden text-white"
-        onClick={toggleMobileMenu}
-        aria-label="Toggle Menu"
-      >
-        {isMobileMenuOpen ? <X size={32} /> : <Menu size={32} />}
-      </button>
-
-      {/* Desktop Nav */}
-      <ul className="hidden lg:flex lg:items-center lg:space-x-6 text-white font-medium tracking-wide">
-        {[
-          { to: "/home", icon: Home, label: "Home" },
-          { to: "/visitors", icon: UserPlus, label: "Visitors" },
-          { to: "/bookings", icon: WalletCards, label: "Rent & Booking" },
-          { to: "/issue-reports", icon: BadgeAlert, label: "Issue Reports" },
-          { to: "/advertisements", icon: Megaphone, label: "Advertisements" },
-        ].map(({ to, icon: Icon, label }) => (
-          <li key={to} className="flex items-center space-x-2">
-            <Icon
-              size={26}
-              className={`transition-colors duration-200 ${
-                isActive(to)
-                  ? "text-amber-300"
-                  : "hover:text-amber-200 cursor-pointer"
-              }`}
-            />
-            <a
-              href={to}
-              className={`text-lg transition-colors duration-200 ${
-                isActive(to)
-                  ? "text-amber-300"
-                  : "hover:text-amber-200 cursor-pointer"
-              }`}
-            >
-              {label}
-            </a>
-            <span className="text-gray-400 select-none">|</span>
-          </li>
-        ))}
-        <li className="relative flex items-center space-x-2" ref={dropdownRef}>
-          <button
-            onClick={toggleDropdown}
-            className="flex items-center text-lg text-white hover:text-amber-200 transition"
-          >
-            <CircleUser size={26} />
-            <span className="ml-1">Account</span>
-            <ChevronDown
-              size={18}
-              className={`ml-1 transition-transform ${
-                isDropdownOpen ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {isDropdownOpen && (
-            <ul className="absolute top-full mt-2 w-44 bg-white text-gray-900 rounded-lg shadow-lg z-50 border">
-              <li>
-                <a
-                  href="/account-settings"
-                  className="flex items-center px-5 py-3 hover:bg-gray-100"
-                >
-                  <Settings className="w-5 h-5 mr-2" />
-                  Account Settings
-                </a>
-              </li>
-              <li>
-                <button
-                  onClick={handleLogout}
-                  className="flex items-center px-5 py-3 text-red-600 hover:bg-red-100 w-full text-left"
-                >
-                  <LogOutIcon className="w-5 h-5 mr-2" />
-                  Logout
-                </button>
-              </li>
-            </ul>
-          )}
-        </li>
-      </ul>
-
-      {/* Right icons (Desktop only) */}
-      <div className="hidden lg:flex items-center space-x-6">
-        <a
-          href="/messages"
-          className={`relative transition-colors duration-200 ${
-            isActive("/messages")
-              ? "text-amber-300"
-              : "text-white hover:text-amber-200"
-          }`}
-        >
-          <Mail size={28} />
-          {notifications.length > 0 && (
-            <span className="absolute -top-2 -right-2 bg-amber-400 text-burgundy-900 text-xs font-semibold rounded-full px-2 py-0.5">
-              {notifications.length}
-            </span>
-          )}
+    <nav className="relative px-4 py-3 bg-burgundy-600 shadow-md z-50">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo */}
+        <a href="/home" className="flex items-center space-x-2">
+          <img src={Logo} alt="Prestige Logo" className="h-10 w-auto" />
+          <span className="text-white text-xl font-semibold select-none hidden md:inline">
+            Hostel Management
+          </span>
         </a>
 
+        {/* Burger Icon (Mobile) */}
         <button
-          onClick={handleLogout}
-          className="bg-burgundy-700 hover:bg-amber-400 hover:text-burgundy-900 transition text-white p-2 rounded-md shadow-md"
+          className="lg:hidden text-white p-2 focus:outline-none"
+          onClick={toggleMobileMenu}
+          aria-label="Toggle Menu"
         >
-          <LogOutIcon size={26} />
+          {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
         </button>
+
+        {/* Desktop Nav */}
+        <ul className="hidden lg:flex items-center space-x-4 text-white font-medium">
+          {navItems.map(({ to, icon: Icon, label }) => (
+            <li key={to} className="flex items-center">
+              <a
+                href={to}
+                className={`flex items-center space-x-1 px-3 py-2 rounded-md transition-colors duration-200 ${
+                  isActive(to) ? "text-amber-300" : "hover:text-amber-200"
+                }`}
+              >
+                <Icon size={22} />
+                <span>{label}</span>
+              </a>
+            </li>
+          ))}
+          {/* Account Dropdown */}
+          <li className="relative" ref={dropdownRef}>
+            <button
+              onClick={toggleDropdown}
+              className="flex items-center space-x-1 px-3 py-2 rounded-md text-white hover:text-amber-200 transition-colors duration-200"
+            >
+              <CircleUser size={22} />
+              <span>Account</span>
+              <ChevronDown
+                size={16}
+                className={`transition-transform duration-200 ${
+                  isDropdownOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {isDropdownOpen && (
+              <ul className="absolute right-0 mt-2 w-48 bg-white text-gray-900 rounded-lg shadow-lg border z-50">
+                <li>
+                  <a
+                    href="/account-settings"
+                    className="flex items-center px-4 py-2 hover:bg-gray-100"
+                  >
+                    <Settings className="w-5 h-5 mr-2" />
+                    Account Settings
+                  </a>
+                </li>
+                <li>
+                  <button
+                    onClick={handleLogout}
+                    className="flex items-center px-4 py-2 text-red-600 hover:bg-red-100 w-full text-left"
+                  >
+                    <LogOutIcon className="w-5 h-5 mr-2" />
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            )}
+          </li>
+        </ul>
+
+        {/* Right Icons (Desktop) */}
+        <div className="hidden lg:flex items-center space-x-4">
+          <a
+            href="/messages"
+            className={`relative p-2 rounded-full transition-colors duration-200 ${
+              isActive("/messages")
+                ? "text-amber-300"
+                : "text-white hover:text-amber-200"
+            }`}
+          >
+            <Mail size={24} />
+            {notifications.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-amber-400 text-burgundy-900 text-xs font-semibold rounded-full px-1.5 py-0.5">
+                {notifications.length}
+              </span>
+            )}
+          </a>
+          <button
+            onClick={handleLogout}
+            className="p-2 bg-burgundy-700 hover:bg-amber-400 hover:text-burgundy-900 rounded-md transition-colors duration-200"
+          >
+            <LogOutIcon size={24} />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="absolute top-full left-0 w-full bg-burgundy-700 text-white z-40 py-4 px-6 space-y-4 lg:hidden shadow-md">
-          {[
-            { to: "/home", icon: Home, label: "Home" },
-            { to: "/visitors", icon: UserPlus, label: "Visitors" },
-            { to: "/bookings", icon: WalletCards, label: "Rent & Booking" },
-            { to: "/issue-reports", icon: BadgeAlert, label: "Issue Reports" },
-            { to: "/advertisements", icon: Megaphone, label: "Advertisements" },
-          ].map(({ to, icon: Icon, label }) => (
+      <div
+        className={`lg:hidden absolute left-0 right-0 bg-burgundy-700 text-white shadow-md transition-all duration-300 ease-in-out ${
+          isMobileMenuOpen
+            ? "max-h-screen opacity-100"
+            : "max-h-0 opacity-0 overflow-hidden"
+        }`}
+      >
+        <div className="container mx-auto py-4 px-6 space-y-3">
+          {navItems.map(({ to, icon: Icon, label }) => (
             <a
               key={to}
               href={to}
-              className="flex items-center space-x-3 text-lg hover:text-amber-300"
+              className={`flex items-center space-x-3 text-lg py-2 rounded-md transition-colors duration-200 ${
+                isActive(to) ? "text-amber-300" : "hover:text-amber-200"
+              }`}
+              onClick={() => setIsMobileMenuOpen(false)} // Close menu on click
             >
-              <Icon size={24} />
+              <Icon size={22} />
               <span>{label}</span>
             </a>
           ))}
           <a
             href="/messages"
-            className="flex items-center space-x-3 text-lg hover:text-amber-300"
+            className={`flex items-center space-x-3 text-lg py-2 rounded-md transition-colors duration-200 ${
+              isActive("/messages") ? "text-amber-300" : "hover:text-amber-200"
+            }`}
+            onClick={() => setIsMobileMenuOpen(false)}
           >
-            <Mail size={24} />
-            <span>Messages</span>
+            <Mail size={22} />
+            <span>
+              Messages {notifications.length > 0 && `(${notifications.length})`}
+            </span>
           </a>
           <button
-            onClick={handleLogout}
-            className="flex items-center space-x-3 text-lg text-red-400 hover:text-red-600"
+            onClick={() => {
+              handleLogout();
+              setIsMobileMenuOpen(false);
+            }}
+            className="flex items-center space-x-3 text-lg py-2 text-red-400 hover:text-red-600 w-full text-left"
           >
-            <LogOutIcon size={24} />
+            <LogOutIcon size={22} />
             <span>Logout</span>
           </button>
         </div>
-      )}
+      </div>
     </nav>
   );
 }

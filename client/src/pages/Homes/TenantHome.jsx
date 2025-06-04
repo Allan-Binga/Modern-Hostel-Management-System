@@ -195,7 +195,7 @@ function TenantHome() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* My Room Details */}
-          <section className="lg:w-3/5 bg-white rounded-3xl shadow-xl p-8 md:p-10 transition-transform hover:scale-[1.02] animate-slideUp relative min-h-[300px]">
+          <section className="lg:w-3/5 bg-white rounded-3xl shadow-xl p-8 md:p-10 transition-transform animate-slideUp relative min-h-[300px]">
             <h2 className="flex items-center gap-3 text-burgundy-700 text-3xl md:text-4xl font-extrabold mb-6">
               <Home size={36} /> My Room
             </h2>

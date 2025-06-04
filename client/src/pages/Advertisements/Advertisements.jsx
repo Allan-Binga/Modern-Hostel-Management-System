@@ -33,6 +33,7 @@ function Advertisements() {
   const [imagePreview, setImagePreview] = useState(null);
 
   const productCategories = [
+    "Other",
     "Electronics",
     "Clothing",
     "Footwear",
@@ -48,7 +49,6 @@ function Advertisements() {
     "Kitchenware",
     "Health & Wellness",
     "Pet Supplies",
-    "Other",
   ];
 
   // Fetch All Advertisements

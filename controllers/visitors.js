@@ -23,10 +23,8 @@ const signInVisitor = async (req, res) => {
 
     const room = roomResult.rows[0];
 
-    // Normalize status
     const status = room.status?.trim().toLowerCase();
 
-    // Reject visit if room is not occupied
     if (status === "available") {
       return res.status(403).json({
         message:
@@ -52,9 +50,9 @@ const signInVisitor = async (req, res) => {
 
     // Validate Entry Time
     const finalEntryTime = entryTime ? new Date(entryTime) : new Date();
-    const finalPlannedExitTime = new Date(
-      `${new Date().toISOString().split("T")[0]}T${plannedExitTime}:00`
-    );
+    const today = new Date();
+    const dateStr = today.toLocaleDateString("en-CA"); // YYYY-MM-DD
+    const finalPlannedExitTime = new Date(`${dateStr}T${plannedExitTime}:00`);
 
     if (finalPlannedExitTime.getHours() > 19) {
       return res
@@ -104,7 +102,6 @@ const signOutVisitor = async (req, res) => {
   }
 
   try {
-    // Find active visitor by phone number
     const checkVisitorQuery = `
       SELECT * FROM visitors 
       WHERE phonenumber = $1 AND is_active = true
@@ -122,9 +119,9 @@ const signOutVisitor = async (req, res) => {
     const visitor = visitorResult.rows[0];
     const { visitorid, entrytime, plannedexittime } = visitor;
 
-    const finalActualExitTime = new Date(
-      `${new Date().toISOString().split("T")[0]}T${actualExitTime}:00`
-    );
+    const today = new Date();
+    const dateStr = today.toLocaleDateString("en-CA"); // YYYY-MM-DD
+    const finalActualExitTime = new Date(`${dateStr}T${actualExitTime}:00`);
 
     if (finalActualExitTime < new Date(entrytime)) {
       return res.status(400).json({
@@ -138,7 +135,6 @@ const signOutVisitor = async (req, res) => {
       });
     }
 
-    // Update exit time and mark visitor inactive
     const updateExitTimeQuery = `
       UPDATE visitors 
       SET exittime = $1, is_active = false 
@@ -152,7 +148,7 @@ const signOutVisitor = async (req, res) => {
 
     res.status(200).json({
       message: "Visitor signed out successfully.",
-      visitor: updatedVisitor.rows[0],
+      // visitor: updatedVisitor.rows[0],
     });
   } catch (error) {
     console.error("Visitor Sign-Out Error:", error);
@@ -165,7 +161,7 @@ const getVisitors = async (req, res) => {
   try {
     const visitors = await client.query("SELECT * FROM visitors");
     res.status(200).json(visitors.rows);
-    console.log(visitors)
+    console.log(visitors);
   } catch (error) {
     res.status(500).json({ mesage: "Could not fetch rooms." });
   }

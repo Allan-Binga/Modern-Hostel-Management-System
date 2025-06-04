@@ -29,14 +29,14 @@ function TenantVisitors() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-burgundy-100 to-burgundy-200">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-burgundy-100 to-burgundy-200 animate-fadeIn">
       <Navbar />
-      <main className="flex-grow max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 pt-20">
-        <header className="mb-6 sm:mb-8 animate-fadeIn">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-burgundy-800">
+      <main className="flex-grow max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-8 md:py-10">
+        <header className="mb-6 sm:mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-burgundy-800 animate-slideIn">
             Your Visitors
           </h1>
-          <p className="text-sm sm:text-base md:text-lg text-burgundy-600 mt-2">
+          <p className="text-base sm:text-lg text-gray-600 mt-2">
             Oversee Your Visitors
           </p>
         </header>
@@ -44,9 +44,11 @@ function TenantVisitors() {
         {loading ? (
           <Spinner />
         ) : visitors.length === 0 ? (
-          <p className="text-center text-gray-600 text-sm sm:text-base">
-            No visitors found.
-          </p>
+          <div className="max-w-md mx-auto bg-white rounded-2xl shadow p-8 mt-10">
+            <p className="text-center text-gray-600 text-base sm:text-lg italic">
+              You currently have no visitors.
+            </p>
+          </div>
         ) : (
           <div className="overflow-x-auto bg-white rounded-lg shadow-md p-4 sm:p-6 animate-fadeIn">
             <table className="min-w-full table-auto text-xs sm:text-sm md:text-base text-left text-gray-700">
