@@ -29,7 +29,7 @@ pipeline {
             slackSend(
                 channel: '#prestige-girls',
                 color: 'danger',
-                message: 'Successfully installed dependencies.'
+                message: 'Failed to install dependencies.'
             )
         }
     }
