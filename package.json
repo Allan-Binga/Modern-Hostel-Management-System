@@ -75,7 +75,8 @@
     "multer": "^2.0.0",
     "multer-s3": "^3.0.1",
     "negotiator": "^1.0.0",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.10",
+    "nodemon": "^3.1.10",
     "normalize-path": "^3.0.0",
     "object-inspect": "^1.13.4",
     "on-finished": "^2.4.1",
@@ -118,7 +119,7 @@
     "wrappy": "^1.0.2"
   },
   "scripts": {
-    "start": "NODE_ENV=production node index.js",
+    "start": "nodemon index.js",
     "dev": "nodemon index.js",
     "heroku-postbuild": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"

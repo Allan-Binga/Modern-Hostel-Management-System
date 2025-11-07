@@ -38,7 +38,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
+        <Route path="/" element={<LandingPage />}  />
         <Route path="/administrator/signup" element={<AdministratorSignup />} />
         <Route path="/administrator/login" element={<AdministratorLogin />} />
         <Route path="/administrator/home" element={<AdministratorHome />} />
