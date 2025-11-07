@@ -33,6 +33,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://159.65.23.201:5900",
   "https://www.prestigegirlshostel.co.ke",
+  "https://prestigegirlshostel.co.ke"
 ];
 
 const corsOptions = {
