@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  - job_name: 'prestige-hostel-local'
+    metrics_path: /prestige-hostel/v1/metrics
+    static_configs:
+      - targets: ['host-gateway:5900']  # This points to your local PM2 app

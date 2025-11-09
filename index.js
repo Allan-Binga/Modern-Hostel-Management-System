@@ -15,6 +15,7 @@ const emailRoute = require("./routes/emailService");
 const notificationRoute = require("./routes/notifications");
 const usersRoute = require("./routes/users");
 const paymentRoutes = require("./routes/payments");
+const metrictsRoute = require("./routes/metrics")
 
 //Import PG client from the config directory
 require("./config/db");
@@ -52,16 +53,24 @@ app.use(cors(corsOptions));
 //Cookie Parser
 app.use(cookieParser());
 
-// Extra security to hide environmental variables.
-// app.use((req, res, next) => {
-//   if (req.path === "/.env" || req.path.startsWith("/.")) {
-//     return res.status(403).send("Forbidden");
-//   }
-//   next();
-// });
+//Track Requests
+const { httpRequestCounter } = require("./controllers/metrics");
+
+app.use((req, res, next) => {
+  res.on("finish", () => {
+    httpRequestCounter.inc({
+      method: req.method,
+      route: req.route ? req.route.path : req.path,
+      status_code: res.statusCode
+    });
+  });
+  next();
+});
+
 
 //Routes
 app.use("/prestige-hostel/v1/auth", authRoute);
+app.use("/prestige-hostel/v1/metrics", metrictsRoute)
 app.use("/prestige-hostel/v1/verify", emailRoute);
 app.use("/prestige-hostel/v1/tenants", tenantRoute);
 app.use("/prestige-hostel/v1/rooms", roomsRoute);
@@ -74,6 +83,8 @@ app.use("/prestige-hostel/v1/notifications", notificationRoute);
 app.use("/prestige-hostel/v1/users", usersRoute);
 app.use("/prestige-hostel/v1/payments", paymentRoutes);
 app.use("/prestige-hostel/v1/password", require("./routes/password"));
+
+
 
 // Serve static files in production
 if (process.env.NODE_ENV === "production") {
