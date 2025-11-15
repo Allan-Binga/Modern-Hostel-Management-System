@@ -231,7 +231,7 @@ function AccountSettings() {
             {/* Left Column: Profile & Preferences */}
             <div className="lg:w-1/2 space-y-8">
               {/* Profile Information */}
-              <section className="bg-white rounded-3xl shadow-xl p-10 animate-slideUp">
+              <section className="bg-white rounded-md shadow-md p-10 animate-slideUp">
                 <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
                   <User size={32} /> Profile Information
                 </h2>
@@ -297,7 +297,7 @@ function AccountSettings() {
                   <button
                     onClick={() => setShowUpdateModal(true)}
                     disabled={loading}
-                    className={`w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 ${
+                    className={`w-full bg-burgundy-500 text-white py-3 px-4 cursor-pointer rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 ${
                       loading ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                   >
@@ -308,7 +308,7 @@ function AccountSettings() {
 
               {/* Preferences */}
               {/* <section
-                className="bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
+                className="bg-white rounded-md shadow-md p-8 animate-slideUp"
                 style={{ animationDelay: "0.1s" }}
               >
                 <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
@@ -340,7 +340,7 @@ function AccountSettings() {
             <div className="lg:w-1/2 space-y-8">
               {/* Security */}
               <section
-                className="bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
+                className="bg-white rounded-md shadow-md p-8 animate-slideUp"
                 style={{ animationDelay: "0.2s" }}
               >
                 <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
@@ -349,14 +349,14 @@ function AccountSettings() {
                 <div className="space-y-4">
                   <button
                     onClick={() => setShowPasswordModal(true)}
-                    className="w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-burgundy-500 text-white py-3 px-4 rounded-lg cursor-pointer hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2"
                     disabled={loading}
                   >
                     {loading ? <Spinner size="sm" /> : "Reset Password"}
                   </button>
                   <button
                     onClick={() => setShowDeleteModal(true)}
-                    className="w-full bg-red-500 text-white py-3 px-4 rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
+                    className="w-full bg-red-500 text-white py-3 px-4 rounded-lg cursor-pointer hover:bg-red-600 transition-colors flex items-center justify-center gap-2"
                   >
                     <Trash2 size={20} /> Delete Account
                   </button>
@@ -365,7 +365,7 @@ function AccountSettings() {
 
               {/* Notifications */}
               <section
-                className="bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
+                className="bg-white rounded-md shadow-md p-8 animate-slideUp"
                 style={{ animationDelay: "0.3s" }}
               >
                 <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
@@ -415,7 +415,7 @@ function AccountSettings() {
         {/* Password Reset Modal */}
         {showPasswordModal && (
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+            <div className="bg-white rounded-md p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowPasswordModal(false)}
@@ -445,7 +445,7 @@ function AccountSettings() {
         {/* Delete Account Modal */}
         {showDeleteModal && (
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+            <div className="bg-white rounded-md p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700 cursor-pointer"
                 onClick={() => setShowDeleteModal(false)}
@@ -491,7 +491,7 @@ function AccountSettings() {
         {/* Update Profile Modal */}
         {showUpdateModal && (
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white rounded-3xl p-8 max-w-md w-full mx-4 relative animate-slideUp">
+            <div className="bg-white rounded-md p-8 max-w-md w-full mx-4 relative animate-slideUp">
               <button
                 className="absolute top-4 right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowUpdateModal(false)}

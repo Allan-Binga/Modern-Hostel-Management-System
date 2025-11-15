@@ -101,6 +101,7 @@
     "send": "^1.2.0",
     "serve-static": "^2.2.0",
     "setprototypeof": "^1.2.0",
+    "sib-api-v3-sdk": "^8.5.0",
     "side-channel": "^1.1.0",
     "side-channel-list": "^1.0.0",
     "side-channel-map": "^1.0.1",
@@ -122,7 +123,6 @@
   "scripts": {
     "start": "NODE_ENV=production node index.js",
     "dev": "nodemon index.js",
-    "heroku-postbuild": "cd client && npm install && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

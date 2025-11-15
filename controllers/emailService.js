@@ -1,13 +1,18 @@
 const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("sib-api-v3-sdk")
 const client = require("../config/db");
 const crypto = require("crypto");
-const dotenv = require("dotenv");
 const PDFDocument = require("pdfkit");
 const path = require("path");
 const fs = require("fs");
-// const {createNotification} = require("./notifications")
 
-dotenv.config();
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+
+// Configure API key authorization
+const apiKey = defaultClient.authentications["api-key"];
+apiKey.apiKey = process.env.BREVO_API_KEY;
+
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 
 const transporter = nodemailer.createTransport({
   service: "Gmail",
@@ -171,25 +176,35 @@ const createReceipt = ({ amountPaid, roomNumber, currentDate }) => {
 const sendVerificationEmail = async (email, token) => {
   const verificationUrl = `${process.env.CLIENT_URL}/account-verification?token=${token}`;
 
-  const mailOptions = {
-    from: `"Murandi Apartments" <${process.env.MAIL_USER}>`, //Name and Email
-    to: email,
-    subject: "Please verify your account.",
-    html: `  <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
-          <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-            <h2 style="color: #333;">Verify Your Account</h2>
-            <p style="color: #555;">Click the button below to verify your account.</p>
-            <a href="${verificationUrl}" 
-              style="display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #2582b8; color: #fff; text-decoration: none; border-radius: 5px;">
-              Verify My Account
-            </a>
-            <p style="margin-top: 20px; color: #777;">If you did not create an account, you can ignore this email.</p>
-          </div>
-        </div>`,
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  //Set properties one by one
+  sendSmtpEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
   };
+  sendSmtpEmail.to = [{ email }];
+  sendSmtpEmail.subject = "Please verify your account";
+  sendSmtpEmail.htmlContent = `
+    <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
+      <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #333;">Verify Your Account</h2>
+        <p style="color: #555;">Click the button below to verify your account.</p>
+        <a href="${verificationUrl}" 
+          style="display: inline-block; padding: 10px 20px; margin-top: 15px; background-color: #2582b8; color: #fff; text-decoration: none; border-radius: 5px;">
+          Verify My Account
+        </a>
+        <p style="margin-top: 20px; color: #777;">If you did not create an account, you can ignore this email.</p>
+      </div>
+    </div>
+  `;
+
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Verification email sent:", response);
+    return response;
   } catch (error) {
+    console.error("Brevo API Error:", error.response?.text || error.message);
     throw error;
   }
 };
@@ -292,78 +307,68 @@ const resendVerificationEmail = async (req, res) => {
   }
 };
 
-//Send Issue Report Email
+// Send Issue Report Email
 const sendIssueReportEmail = async (email, category) => {
-  const subject = "Issue Report Received";
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
-  const message = `
+  // Set properties one by one
+  sendSmtpEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
+  };
+  sendSmtpEmail.to = [{ email }];
+  sendSmtpEmail.subject = "Issue Report Received";
+  sendSmtpEmail.htmlContent = `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.15);">
-        <div style="text-align: center; margin-bottom: 20px;">
-          <img src="cid:logo" alt="Prestige Girls Hostels" style="max-width: 200px; max-height: 200px;" />
-        </div>
         <h2 style="color: #333; margin-bottom: 10px;">Issue Report Received</h2>
         <p style="color: #555;">Hello,</p>
-        <p style="color: #555;">Thank you, we have received your issue report regarding category: <strong> ${category}</strong></p>
+        <p style="color: #555;">Thank you, we have received your issue report regarding category: <strong>${category}</strong></p>
         <p style="color: #555;">One of our skilled technicians will be assigned to assist you shortly. Feel free to reach out if you have any questions.</p>
-      
       </div>
     </div>
   `;
 
-  const mailOptions = {
-    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
-    to: email,
-    subject: subject,
-    html: message,
-    attachments: [
-      {
-        filename: "prestigeLogo.png",
-        path: "./assets/prestigeLogo.png",
-        cid: "logo",
-      },
-    ],
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Issue report email sent:", response);
+    return response;
   } catch (error) {
+    console.error("Brevo API Error:", error.response?.text || error.message);
     throw error;
   }
 };
 
-//Send Admin Email
-const sendIssueSubmissionEmailAdmin = async (
-  adminEmail,
-  tenantId,
-  category
-) => {
-  const subject = "New Issue Reported - Action Required";
+// Send Admin Email
+const sendIssueSubmissionEmailAdmin = async (adminEmail, tenantId, category) => {
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
-  const message = `
+  // Set properties one by one
+  sendSmtpEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
+  };
+  sendSmtpEmail.to = [{ email: adminEmail }];
+  sendSmtpEmail.subject = "New Issue Reported - Action Required";
+  sendSmtpEmail.htmlContent = `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.15);">
         <h2 style="color: #333;">New Issue Reported</h2>
         <p style="color: #555;">Dear Admin,</p>
-        <p style="color: #555;">A new issue has been reported by tenant with the id of ${tenantId} in the category of <strong>${category}</strong>.</p>
+        <p style="color: #555;">A new issue has been reported by tenant with the id of <strong>${tenantId}</strong> in the category of <strong>${category}</strong>.</p>
         <p style="color: #555;">Please log in to the platform to assign a technician for this issue.</p>
         <p style="margin-top: 20px; color: #777;">If you have any questions, please reach out to support.</p>
       </div>
     </div>
   `;
 
-  const mailOptions = {
-    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
-    to: adminEmail,
-    subject: subject,
-    html: message,
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
-    console.log(`Admin notification email sent to ${adminEmail}`);
+    const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log(`Admin notification email sent to ${adminEmail}:`, response);
+    return response;
   } catch (error) {
-    console.error("Error sending admin notification email:", error);
+    console.error("Brevo API Error (Admin Email):", error.response?.text || error.message);
+    throw error;
   }
 };
 
@@ -374,9 +379,16 @@ const technicianAssignmentEmail = async (
   technicianPhone,
   issueCategory
 ) => {
-  const subject = "Technician Assigned - Prestige Girls Hostel";
+  const sendSMTPEmail = new SibApiV3Sdk.SendSmtpEmail()
 
-  const message = `
+  //Set Properties
+  sendSMTPEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
+  };
+  sendSMTPEmail.to = [{ email }]
+  sendSMTPEmail.subject = "Technician Assignment"
+  sendSMTPEmail.htmlContent = `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.15);">
         <div style="text-align: center; margin-bottom: 20px;">
@@ -396,33 +408,29 @@ const technicianAssignmentEmail = async (
     </div>
   `;
 
-  const mailOptions = {
-    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
-    to: email,
-    subject: subject,
-    html: message,
-    attachments: [
-      {
-        filename: "prestigeLogo.png",
-        path: "./assets/prestigeLogo.png",
-        cid: "logo",
-      },
-    ],
-  };
-
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await apiInstance.sendTransacEmail(sendSMTPEmail)
     // console.log(`Email sent to ${email} with technician details.`);
+    return response;
   } catch (error) {
-    console.error("Error sending technician assignment email:", error);
+    console.error("Brevo API Error:", error.response?.text || error.message);
+    throw error;
   }
 };
 
 //Send Payment Failure Email
 const sendPaymentFailureEmail = async (email) => {
-  const subject = "Failed Rent Payment Attempt";
+  const sendSMTPEmail = new SibApiV3Sdk.SendSmtpEmail()
 
-  const message = ` 
+  //Set Properties
+  // const subject = "Failed Rent Payment Attempt";
+  sendSMTPEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
+  }
+  sendSMTPEmail.to = [{ email }]
+  sendSMTPEmail.subject = "Failed Rent Payment Attempt"
+  sendSMTPEmail.htmlContent = ` 
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.15);">
         <div style="text-align: center; margin-bottom: 20px;">
@@ -434,23 +442,12 @@ const sendPaymentFailureEmail = async (email) => {
       </div>
     </div>`;
 
-  const mailOptions = {
-    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
-    to: email,
-    subject: subject,
-    html: message,
-    attachments: [
-      {
-        filename: "prestigeLogo.png",
-        path: "./assets/prestigeLogo.png",
-        cid: "logo",
-      },
-    ],
-  };
 
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await apiInstance.sendTransacEmail(sendSMTPEmail)
+    return response;
   } catch (error) {
+    console.error("Brevo API Error:", error.response?.text || error.message);
     throw error;
   }
 };
@@ -458,15 +455,18 @@ const sendPaymentFailureEmail = async (email) => {
 // Password Reset Email
 const sendPasswordResetEmail = async (email, token) => {
   const resetUrl = `${process.env.CLIENT_URL}/password/reset?token=${token}`;
+  const sendSMTPEmail = new SibApiV3Sdk.SendSmtpEmail()
 
-  const subject = "Password Reset Request Received";
-
-  const message = `
+  //Set Properties
+  sendSMTPEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
+  }
+  sendSMTPEmail.to = [{ email }]
+  sendSMTPEmail.subject = "Password Reset Request Received"
+  sendSMTPEmail.htmlContent = `
       <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
         <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-         <div style="text-align: center; margin-bottom: 20px;">
-          <img src="cid:logo" alt="Prestige Girls Hostels" style="max-width: 200px; max-height: 2000px;" />
-        </div>
           <h2 style="color: #333;">Password Reset Request</h2>
           <p style="color: #555;">Click the button below to reset your password.</p>
           <a href="${resetUrl}" 
@@ -477,25 +477,13 @@ const sendPasswordResetEmail = async (email, token) => {
         </div>
       </div>`;
 
-  const mailOptions = {
-    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
-    to: email,
-    subject: subject,
-    html: message,
-    attachments: [
-      {
-        filename: "prestigeLogo.png",
-        path: "./assets/prestigeLogo.png",
-        cid: "logo",
-      },
-    ],
-  };
 
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await apiInstance.sendTransacEmail(sendSMTPEmail)
     console.log(`Password reset email sent to ${email}`);
+    return response;
   } catch (error) {
-    console.error(`Error sending password reset email:`, error);
+    console.error("Brevo API Error:", error.response?.text || error.message);
     throw error;
   }
 };

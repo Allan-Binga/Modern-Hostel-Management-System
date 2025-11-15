@@ -163,7 +163,7 @@ function TenantHome() {
         </header>
 
         {/* Quick Stats */}
-        <section className="mb-8 bg-white rounded-3xl shadow-xl p-8 animate-slideUp">
+        <section className="mb-8 bg-white rounded-md shadow-sm p-8 animate-slideUp">
           <h2 className="text-2xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
             <Home size={32} /> Your Overview
           </h2>
@@ -195,7 +195,7 @@ function TenantHome() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           {/* My Room Details */}
-          <section className="lg:w-3/5 bg-white rounded-3xl shadow-xl p-8 md:p-10 transition-transform animate-slideUp relative min-h-[300px]">
+          <section className="lg:w-3/5 bg-white rounded-md shadow-md p-8 md:p-10 transition-transform animate-slideUp relative min-h-[300px]">
             <h2 className="flex items-center gap-3 text-burgundy-700 text-3xl md:text-4xl font-extrabold mb-6">
               <Home size={36} /> My Room
             </h2>
@@ -282,7 +282,7 @@ function TenantHome() {
 
           {/* Recent Advertisement */}
           <section
-            className="lg:w-2/5 bg-white rounded-3xl shadow-lg p-6 md:p-8 flex flex-col animate-slideUp relative min-h-[300px]"
+            className="lg:w-2/5 bg-white rounded-md shadow-md p-6 md:p-8 flex flex-col animate-slideUp relative min-h-[300px]"
             style={{ animationDelay: "0.2s" }}
           >
             <h2 className="flex items-center gap-3 text-burgundy-700 text-2xl md:text-3xl font-extrabold mb-6">
@@ -308,7 +308,7 @@ function TenantHome() {
                   .map((ad, index) => (
                     <li
                       key={ad.ad_id}
-                      className="border border-gray-300 rounded-2xl p-5 transition-all duration-300 cursor-pointer animate-stagger"
+                      className="border border-gray-300 rounded-lg p-5 transition-all duration-300 cursor-pointer animate-stagger"
                       style={{ animationDelay: `${0.1 * index}s` }}
                       onClick={() => handleAdClick(ad)}
                     >
@@ -410,7 +410,7 @@ function TenantHome() {
               {rooms.map((room, index) => (
                 <div
                   key={room.roomid}
-                  className="bg-white rounded-3xl shadow-lg overflow-hidden transition-transform hover:scale-[1.02] animate-slideUp"
+                  className="bg-white rounded-lg shadow-lg overflow-hidden transition-transform animate-slideUp"
                   style={{ animationDelay: `${0.1 * index}s` }}
                 >
                   <img
@@ -448,7 +448,7 @@ function TenantHome() {
                       <span>KES {parseFloat(room.price).toLocaleString()}</span>
                     </div>
                     <button
-                      className="w-full flex items-center justify-center gap-2 bg-burgundy-500 text-white px-4 py-3 rounded-lg hover:bg-burgundy-600 transition-colors cursor-pointer"
+                      className="w-full flex items-center justify-center gap-2 bg-burgundy-500 text-white px-4 py-3 rounded-md hover:bg-burgundy-600 transition-colors cursor-pointer"
                       onClick={() => handleBookClick(room)}
                     >
                       <MessageSquare size={20} /> Book Now

@@ -121,8 +121,7 @@ function Bookings() {
         </header>
 
         {/* Pay Rent Section */}
-        {/* Pay Rent Section */}
-        <section className="mb-12 bg-white rounded-3xl shadow-xl p-8 animate-slideUp">
+        <section className="mb-12 bg-white rounded-md shadow-md p-8 animate-slideUp">
           <h2 className="text-2xl font-bold text-burgundy-700 mb-6 flex items-center gap-3">
             <BanknoteArrowUp size={28} /> Pay Rent
           </h2>
@@ -182,7 +181,7 @@ function Bookings() {
               <Spinner />
             </div>
           ) : filteredBookings.length === 0 ? (
-            <div className="bg-white rounded-3xl p-8 shadow-xl text-center text-gray-500 border border-gray-200">
+            <div className="bg-white rounded-md p-8 shadow-md text-center text-gray-500 border border-gray-200">
               <p className="text-lg italic">You have no bookings yet.</p>
             </div>
           ) : (
@@ -190,7 +189,7 @@ function Bookings() {
               {filteredBookings.map((booking, index) => (
                 <div
                   key={booking.booking_id}
-                  className="bg-white shadow-lg rounded-3xl p-6 border border-gray-200 transition-all duration-300 animate-slideUp"
+                  className="bg-white shadow-md rounded-md p-6 border border-gray-200 transition-all duration-300 animate-slideUp"
                   style={{ animationDelay: `${0.1 * index}s` }}
                 >
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700">
@@ -287,7 +286,7 @@ function Bookings() {
               <Spinner />
             </div>
           ) : payments.length === 0 ? (
-            <div className="bg-white shadow-lg rounded-3xl p-8 text-center text-gray-500 border border-gray-200">
+            <div className="bg-white shadow-md rounded-md p-8 text-center text-gray-500 border border-gray-200">
               <p className="text-lg italic">You have no payment history yet.</p>
             </div>
           ) : (
@@ -295,7 +294,7 @@ function Bookings() {
               {payments.map((payment, index) => (
                 <div
                   key={payment.payment_id}
-                  className="bg-white shadow-md rounded-2xl p-5 border border-gray-200 hover:shadow-lg transition duration-300"
+                  className="bg-white shadow-md rounded-lg p-5 border border-gray-200 hover:shadow-lg transition duration-300"
                 >
                   <div className="space-y-2 text-gray-700">
                     <div className="flex justify-between items-center">

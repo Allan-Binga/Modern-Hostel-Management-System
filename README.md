@@ -139,7 +139,6 @@ Prestige Hostel Management System is your all-in-one digital assistant for organ
 
 4. **Handle Payments:**  
      - Process payments securely with Stripe.  
-     - _M-Pesa will be available once a registered business account is set up._
 
 5. **Check Emails:**  
      - Tenants receive automated notifications—no extra steps needed.
@@ -189,11 +188,7 @@ Prestige Hostel Management System is your all-in-one digital assistant for organ
 2. **Feedback:**  
      - Share your thoughts or request new features.
 
-3. **M-Pesa Integration:**  
-     - Once you have a registered business account, we can enable this payment option.
-
 ---
 
-Thank you for choosing **Prestige Hostel Management System**!  
-We’re here to make hostel management simple and efficient.  
+Thank you for choosing **Prestige Hostel Management System**!  We’re here to make hostel management simple and efficient.  
 _Questions? Reach out anytime!_

@@ -106,7 +106,7 @@ function IssueReport() {
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Reported Issues (Right) */}
           <section
-            className="lg:w-2/3 bg-white rounded-3xl shadow-xl p-8 animate-slideUp"
+            className="lg:w-2/3 bg-white rounded-md shadow-md p-8 animate-slideUp"
             style={{ animationDelay: "0.2s" }}
           >
             <h2 className="text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-6 flex items-center gap-3">
@@ -126,7 +126,7 @@ function IssueReport() {
                 {issueReports.map((report, index) => (
                   <li
                     key={index}
-                    className="border border-gray-300 rounded-2xl p-5 hover:shadow-sm hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                    className="border border-gray-300 rounded-md p-5 hover:shadow-sm hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
                     style={{ animationDelay: `${0.1 * index}s` }}
                     onClick={() => handleReportClick(report)}
                   >
@@ -159,7 +159,7 @@ function IssueReport() {
           </section>
 
           {/* Report an Issue Section (Left) */}
-          <section className="lg:w-1/3 bg-white rounded-3xl shadow-xl p-8 transition-transform hover:scale-[1.02] animate-slideUp">
+          <section className="lg:w-1/3 bg-white rounded-md shadow-md p-8 transition-transform animate-slideUp">
             <h2 className="text-2xl font-extrabold text-burgundy-700 mb-4">
               Tenant Feedback
             </h2>

@@ -170,7 +170,7 @@ function Advertisements() {
         <div className="flex flex-col lg:flex-row gap-6 sm:gap-8 mb-8 sm:mb-10">
           {/* My Advertisements Section */}
           <section
-            className="w-full lg:w-2/3 bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 animate-slideUp"
+            className="w-full lg:w-2/3 bg-white rounded-md shadow-md p-4 sm:p-6 md:p-8 animate-slideUp"
             style={{ animationDelay: "0.1s" }}
           >
             <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
@@ -196,13 +196,13 @@ function Advertisements() {
                   .map((ad, index) => (
                     <li
                       key={ad.ad_id}
-                      className="border border-gray-300 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 transition-all duration-300 cursor-pointer animate-stagger hover:bg-burgundy-50"
+                      className="border border-gray-300 rounded-md p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 transition-all duration-300 cursor-pointer animate-stagger hover:bg-burgundy-50"
                       style={{ animationDelay: `${0.1 * index}s` }}
                       onClick={() => handleAdClick(ad)}
                     >
                       {/* Image */}
                       {ad.image && (
-                        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-100">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 border border-gray-100">
                           <img
                             src={ad.image}
                             alt={ad.ad_title}
@@ -260,7 +260,7 @@ function Advertisements() {
 
           {/* Post an Ad Section */}
           <section
-            className="w-full lg:w-1/3 bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 transition-transform hover:scale-[1.01] sm:hover:scale-[1.02] animate-slideUp"
+            className="w-full lg:w-1/3 bg-white rounded-md shadow-xl p-4 sm:p-6 md:p-8 transition-transform hover:scale-[1.01] sm:hover:scale-[1.02] animate-slideUp"
             style={{ animationDelay: "0.2s" }}
           >
             <h2 className="text-xl sm:text-2xl font-extrabold text-burgundy-700 mb-3 sm:mb-4">
@@ -271,7 +271,7 @@ function Advertisements() {
               services by posting an advertisement below.
             </p>
             <button
-              className="w-full bg-burgundy-500 text-white py-2 sm:py-3 px-4 rounded-lg hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
+              className="w-full bg-burgundy-500 text-white py-2 sm:py-3 px-4 rounded-md hover:bg-burgundy-600 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
               onClick={() => setShowModal(true)}
             >
               <MessageSquare size={16} className="w-4 h-4 sm:w-5 sm:h-5" /> Post
@@ -282,7 +282,7 @@ function Advertisements() {
 
         {/* All Advertisements Section */}
         <section
-          className="bg-white rounded-3xl shadow-xl p-4 sm:p-6 md:p-8 animate-slideUp"
+          className="bg-white rounded-md shadow-xl p-4 sm:p-6 md:p-8 animate-slideUp"
           style={{ animationDelay: "0.3s" }}
         >
           <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-burgundy-700 mb-4 sm:mb-6 flex items-center gap-2 sm:gap-3">
@@ -311,7 +311,7 @@ function Advertisements() {
                 .map((ad, index) => (
                   <li
                     key={ad.ad_id}
-                    className="border border-gray-300 rounded-2xl p-4 sm:p-5 hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
+                    className="border border-gray-300 rounded-md p-4 sm:p-5 hover:bg-burgundy-50 transition-all duration-300 cursor-pointer animate-stagger"
                     style={{ animationDelay: `${0.1 * index}s` }}
                     onClick={() => handleAdClick(ad)}
                   >
@@ -368,7 +368,7 @@ function Advertisements() {
 
                       {/* Image */}
                       {ad.image && (
-                        <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-100">
+                        <div className="w-32 h-32 sm:w-40 sm:h-40 flex-shrink-0 rounded-md overflow-hidden bg-gray-100 border border-gray-100">
                           <img
                             src={ad.image}
                             alt={ad.ad_title}
@@ -386,7 +386,7 @@ function Advertisements() {
         {/* Post Advertisement Modal */}
         {showModal && (
           <div className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center z-50 animate-fadeIn">
-            <div className="bg-white rounded-3xl p-4 sm:p-6 md:p-8 max-w-md w-full mx-4 relative animate-slideUp max-h-[90vh] overflow-y-auto scrollbar-custom">
+            <div className="bg-white rounded-md p-4 sm:p-6 md:p-8 max-w-md w-full mx-4 relative animate-slideUp max-h-[90vh] overflow-y-auto scrollbar-custom">
               <button
                 className="absolute top-3 sm:top-4 right-3 sm:right-4 text-gray-500 hover:text-burgundy-700"
                 onClick={() => setShowModal(false)}
@@ -413,7 +413,7 @@ function Advertisements() {
                         setFormData({ ...formData, adTitle: e.target.value })
                       }
                       placeholder="Enter ad title"
-                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       required
                     />
                   </div>
@@ -430,7 +430,7 @@ function Advertisements() {
                         })
                       }
                       placeholder="Describe your ad"
-                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       rows="4"
                       required
                     />
@@ -447,7 +447,7 @@ function Advertisements() {
                           productCategory: e.target.value,
                         })
                       }
-                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       required
                     >
                       <option value="" className="text-gray-700">
@@ -468,7 +468,7 @@ function Advertisements() {
                     <div className="flex items-center">
                       <label
                         htmlFor="file-upload"
-                        className="flex items-center w-full p-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200"
+                        className="flex items-center w-full p-2 border border-gray-300 rounded-md cursor-pointer hover:bg-gray-50 transition-colors duration-200"
                       >
                         <Upload className="w-4 h-4 sm:w-5 sm:h-5 text-gray-500 mr-2" />
                         <span className="text-gray-500 truncate text-sm sm:text-base">
@@ -490,7 +490,7 @@ function Advertisements() {
                         <img
                           src={imagePreview}
                           alt="Preview"
-                          className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-lg border border-gray-300"
+                          className="w-32 h-32 sm:w-40 sm:h-40 object-cover rounded-md border border-gray-300"
                         />
                       </div>
                     )}
@@ -510,7 +510,7 @@ function Advertisements() {
                         })
                       }
                       placeholder="Enter duration"
-                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-lg focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
+                      className="w-full p-2 sm:p-3 border border-gray-300 rounded-md focus:ring-1 focus:ring-gray-300 focus:border-gray-300 focus:outline-none text-sm sm:text-base"
                       min="1"
                       required
                     />
@@ -520,14 +520,14 @@ function Advertisements() {
                     <button
                       type="button"
                       onClick={() => setShowModal(false)}
-                      className="bg-gray-400 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-gray-500 transition-colors text-sm sm:text-base"
+                      className="bg-gray-400 text-white py-2 px-3 sm:px-4 rounded-md hover:bg-gray-500 transition-colors text-sm sm:text-base"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={loading}
-                      className={`bg-burgundy-500 text-white py-2 px-3 sm:px-4 rounded-lg hover:bg-burgundy-600 transition-colors text-sm sm:text-base ${
+                      className={`bg-burgundy-500 text-white py-2 px-3 sm:px-4 rounded-md hover:bg-burgundy-600 transition-colors text-sm sm:text-base ${
                         loading ? "opacity-50 cursor-not-allowed" : ""
                       }`}
                     >
