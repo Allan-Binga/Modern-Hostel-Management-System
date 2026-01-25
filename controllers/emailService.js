@@ -178,7 +178,7 @@ const sendVerificationEmail = async (email, token) => {
 
   const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
 
-  //Set properties one by one
+  //Set properties
   sendSmtpEmail.sender = {
     name: "Prestige Hostels",
     email: "noreply@prestigegirlshostel.co.ke"
@@ -574,56 +574,59 @@ const sendRentPaymentEmail = async (
   email,
   { amountPaid, roomNumber, paymentDate }
 ) => {
-  const subject = "Rent Payment Confirmation";
-  // console.log(amountPaid);
-  // console.log(paymentDate);
-
-  //Calculate Next Rent Date
+  // Calculate Next Rent Date
   const currentDate = new Date(paymentDate);
   const nextPaymentDate = new Date(currentDate);
   nextPaymentDate.setDate(currentDate.getDate() + 30);
   const formattedNextPaymentDate = nextPaymentDate.toISOString().split("T")[0];
 
-  //Generate PDF receipt
+  // Generate PDF receipt (returns Buffer)
   const pdfBuffer = await createReceipt({
     amountPaid,
     roomNumber,
     currentDate,
   });
 
-  const message = `
+  // Convert buffer to base64 string
+  const pdfBase64 = pdfBuffer.toString('base64');
+
+  // Create Brevo email object
+  const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+
+  sendSmtpEmail.sender = {
+    name: "Prestige Hostels",
+    email: "noreply@prestigegirlshostel.co.ke"
+  };
+
+  sendSmtpEmail.to = [{ email }];
+
+  sendSmtpEmail.subject = "Rent Payment Confirmation";
+
+  sendSmtpEmail.htmlContent = `
     <div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
       <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
         <h2 style="color: #333;">Rent Payment Received</h2>
         <p style="color: #555;">Hi,</p>
-        <p style="color: #555;">We have received your rent payment for room <strong>${roomNumber}.</p>
+        <p style="color: #555;">We have received your rent payment for room <strong>${roomNumber}</strong>.</p>
         <p style="color: #555;">Your next rent payment is due by <strong>${formattedNextPaymentDate}</strong>.</p>
         <p style="margin-top: 20px; color: #777;">Thank you.</p>
       </div>
     </div>`;
 
-  const mailOptions = {
-    from: `"Prestige Girls Hostel" <${process.env.MAIL_USER}>`,
-    to: email,
-    subject: subject,
-    html: message,
-    attachments: [
-      {
-        filename: `receipt_${paymentDate}.pdf`,
-        content: pdfBuffer,
-        encoding: "base64",
-      },
-      {
-        filename: "prestigeLogo.png",
-        path: "./assets/prestigeLogo.png",
-        cid: "logo",
-      },
-    ],
-  };
+  // Attach PDF correctly using Brevo's format
+  sendSmtpEmail.attachment = [
+    {
+      name: `receipt_${paymentDate}.pdf`,
+      content: pdfBase64
+    }
+  ];
 
   try {
-    await transporter.sendMail(mailOptions);
+    const response = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    console.log("Rent payment email sent successfully:", response);
+    return response;
   } catch (error) {
+    console.error("Brevo API Error:", error.response?.data || error.message);
     throw error;
   }
 };
