@@ -6,7 +6,7 @@ import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { endpoint } from "../../backendAPI";
-import LandingNavbar from "../../components/LandingNavbar"; 
+import LandingNavbar from "../../components/LandingNavbar";
 
 function TenantLogin() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -110,7 +110,7 @@ function TenantLogin() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="johndoe@gmail.com"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
 
@@ -124,7 +124,7 @@ function TenantLogin() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
               <span
                 className="absolute right-3 top-10 text-gray-500 cursor-pointer"
@@ -138,7 +138,7 @@ function TenantLogin() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-burgundy-500 text-white rounded-full hover:bg-burgundy-400 transition duration-200 cursor-pointer"
+              className="w-full py-3 bg-burgundy-500 text-white rounded-md hover:bg-burgundy-400 transition duration-200 cursor-pointer"
             >
               SIGN IN
             </button>
@@ -162,24 +162,6 @@ function TenantLogin() {
               className="text-burgundy-500 font-semibold hover:underline hover:text-pink-900"
             >
               Sign Up
-            </Link>
-          </p>
-
-          {/* Divider */}
-          <div className="flex items-center justify-center space-x-2">
-            <hr className="w-1/4 border-gray-300" />
-            <span className="text-md text-gray-500">Or</span>
-            <hr className="w-1/4 border-gray-300" />
-          </div>
-
-          {/* Administrator Signup */}
-          <p className="text-center text-md text-gray-600">
-            Are you an administrator?{" "}
-            <Link
-              to="/administrator/login"
-              className="text-burgundy-500 hover:underline font-semibold hover:text-pink-900"
-            >
-              Click Here
             </Link>
           </p>
         </div>

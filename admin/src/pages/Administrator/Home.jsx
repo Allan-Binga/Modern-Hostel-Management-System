@@ -10,7 +10,6 @@ import {
   Tag,
   Clock,
   BanknoteArrowUp,
-  Filter,
   X,
   PlusSquare,
   Upload,
@@ -111,10 +110,10 @@ function AdministratorHome() {
   // Case-insensitive filtering for roomtype or status
   const filteredRooms = roomFilter
     ? rooms.filter((room) =>
-        [room.roomtype, room.status].some((field) =>
-          field.toLowerCase().includes(roomFilter.toLowerCase())
-        )
+      [room.roomtype, room.status].some((field) =>
+        field.toLowerCase().includes(roomFilter.toLowerCase())
       )
+    )
     : rooms;
 
   const handleAddRoomClick = () => {
@@ -213,7 +212,7 @@ function AdministratorHome() {
             {/* Add Room Button */}
             <div className="relative w-full sm:w-auto">
               <button
-                className="bg-burgundy-500 text-white px-4 py-2 rounded-full flex items-center gap-2 shadow-lg hover:bg-burgundy-600 transition text-sm sm:text-base cursor-pointer"
+                className="bg-burgundy-500 text-white px-4 py-2 rounded-sm flex items-center gap-2 shadow-lg hover:bg-burgundy-600 transition text-sm sm:text-base cursor-pointer"
                 onClick={handleAddRoomClick}
               >
                 <PlusSquare className="w-5 h-5" />
@@ -235,7 +234,7 @@ function AdministratorHome() {
               {filteredRooms.map((room, index) => (
                 <div
                   key={room.roomid}
-                  className="bg-white rounded-lg shadow-sm overflow-hidden transition-transform hover:scale-105 animate-slideUp"
+                  className="bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 ease-out hover:scale-[1.02] hover:shadow-lg animate-slideUp"
                   style={{ animationDelay: `${0.1 * index}s` }}
                 >
                   <img
@@ -275,7 +274,7 @@ function AdministratorHome() {
                     </div>
                     <button
                       onClick={() => setSelectedRoom(room)}
-                      className="inline-flex items-center gap-2 bg-burgundy-500 text-burgundy-100 px-4 py-2 rounded-lg hover:bg-burgundy-600 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-burgundy-400"
+                      className="inline-flex items-center gap-2 bg-burgundy-500 text-burgundy-100 px-4 py-2 rounded-sm cursor-pointer hover:bg-burgundy-600 transition-all hover:scale-105 focus:outline-none focus:ring-2 focus:ring-burgundy-400"
                       aria-label={`View details for ${room.roomtype} room ${room.roomid}`}
                     >
                       View Details
@@ -311,7 +310,7 @@ function AdministratorHome() {
               <button
                 ref={firstFocusableRef}
                 onClick={() => setSelectedRoom(null)}
-                className="text-burgundy-600 hover:text-burgundy-800 focus:outline-none focus:ring-2 focus:ring-burgundy-400 rounded-full p-1"
+                className="text-burgundy-600 hover:text-burgundy-800 focus:outline-none focus:ring-2 focus:ring-burgundy-400 rounded-sm p-1"
                 aria-label="Close modal"
               >
                 <X size={24} />
@@ -404,7 +403,7 @@ function AdministratorHome() {
                 onChange={(e) =>
                   setFormData({ ...formData, room_type: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-200 focus:border-gray-200"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-sm focus:ring-gray-200 focus:border-gray-200"
                 placeholder="Shared/Single"
               />
             </div>
@@ -420,7 +419,7 @@ function AdministratorHome() {
                 onChange={(e) =>
                   setFormData({ ...formData, beds: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-400 focus:border-gray-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-sm focus:ring-gray-400 focus:border-gray-500"
                 min={1}
               />
             </div>
@@ -436,7 +435,7 @@ function AdministratorHome() {
                 onChange={(e) =>
                   setFormData({ ...formData, price: e.target.value })
                 }
-                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-gray-400 focus:border-gray-500"
+                className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-sm focus:ring-gray-400 focus:border-gray-500"
               />
             </div>
 
@@ -470,13 +469,13 @@ function AdministratorHome() {
             <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => setAddRoomModal(false)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 cursor-pointer"
+                className="px-5 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-red-100 cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 onClick={createRoom}
-                className="px-5 py-2 text-sm font-semibold bg-burgundy-500 text-white rounded hover:bg-burgundy-600 transition cursor-pointer"
+                className="px-5 py-2 text-sm font-semibold bg-burgundy-500 text-white hover:bg-burgundy-600 transition cursor-pointer"
               >
                 Add Room
               </button>
@@ -485,6 +484,21 @@ function AdministratorHome() {
         </div>
       )}
 
+      {/*Update Room Details*/}
+      {updateModal && (
+        <div
+          className="fixed inset-0 backdrop-blur-sm bg-white/30 flex items-center justify-center px-4"
+          onClick={handleClickOutside}
+        >
+          <div
+            ref={modalRef}
+            className="bg-white rounded-lg shadow-lg max-w-lg w-full p-6 space-y-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+          </div>
+        </div>
+      )}
       <Footer />
     </div>
   );

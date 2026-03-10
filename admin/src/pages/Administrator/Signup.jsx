@@ -1,11 +1,8 @@
 import authImage from "../../assets/authImage.jpg";
 import Logo from "../../assets/prestigeLogo.png";
-import Spinner from "../../components/Spinner";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
 import { toast } from "react-toastify";
 import { endpoint } from "../../backendAPI";
 
@@ -49,7 +46,7 @@ function AdministratorSignup() {
           {/* Welcome Text */}
           <div className="text-center">
             <h2 className="text-2xl font-bold text-gray-900">
-              Sign Up as an Administrator
+              Sign Up
             </h2>
           </div>
 
@@ -93,7 +90,7 @@ function AdministratorSignup() {
 
                 setFieldErrors({});
                 toast.success(data.message);
-                setTimeout(() => navigate("/administrator/login"), 4000);
+                setTimeout(() => navigate("/prestige-admin/login"), 4000);
               } catch (error) {
                 toast.error("Server error. Please try again.");
               } finally {
@@ -121,7 +118,7 @@ function AdministratorSignup() {
                   }));
                 }}
                 placeholder="0712345678"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
             <div>
@@ -134,7 +131,7 @@ function AdministratorSignup() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="johndoe@gmail.com"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
 
@@ -151,13 +148,11 @@ function AdministratorSignup() {
                   setFieldErrors((prev) => ({ ...prev, password: "" })); // Clear error on input
                 }}
                 placeholder="••••••••"
-                className={`mt-1 block w-full border ${
-                  fieldErrors.password ? "border-red-500" : "border-gray-300"
-                } rounded-full shadow-sm py-2.5 px-4 text-sm focus:outline-none focus:ring-2 ${
-                  fieldErrors.password
-                    ? "focus:ring-red-500"
-                    : "focus:ring-blue-500"
-                }`}
+                className={`mt-1 block w-full border ${fieldErrors.password ? "border-red-500" : "border-gray-300"
+                  } rounded-md shadow-sm py-2.5 px-4 text-sm focus:outline-none focus:ring-2 ${fieldErrors.password
+                    ? "focus:ring-red-100"
+                    : "focus:ring-pink-100"
+                  }`}
               />
               <span
                 className="absolute right-3 top-10 text-gray-500 cursor-pointer"
@@ -175,15 +170,14 @@ function AdministratorSignup() {
             {/* Signup Button */}
             <button
               type="submit"
-              className={`w-full py-3 text-white rounded-full transition duration-200 cursor-pointer ${
-                loading
+              className={`w-full py-3 text-white rounded-md transition duration-200 cursor-pointer ${loading
                   ? "bg-gray-400"
                   : "bg-burgundy-500 hover:bg-burgundy-400"
-              } flex items-center justify-center`}
+                } flex items-center justify-center`}
               disabled={loading}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-gray-300 rounded-full animate-spin border-t-transparent"></div>
+                <div className="w-5 h-5 border-2 border-gray-300 rounded-md animate-spin border-t-transparent"></div>
               ) : (
                 "SIGN UP"
               )}
@@ -194,27 +188,13 @@ function AdministratorSignup() {
           <p className="text-center text-md text-gray-600 font-semibold">
             Already have an account?{" "}
             <Link
-              to="/administrator/login"
+              to="/prestige-admin/login"
               className="text-burgundy-500 hover:underline"
             >
               Sign In
             </Link>
           </p>
 
-          {/* Divider */}
-          <div className="flex items-center justify-center space-x-2">
-            <hr className="w-1/4 border-gray-300" />
-            <span className="text-md text-gray-500">Or</span>
-            <hr className="w-1/4 border-gray-300" />
-          </div>
-
-          {/* Administrator Signup */}
-          <p className="text-center text-md text-gray-600 font-semibold">
-            Are you a resident?{" "} 
-            <Link to="/signup" className="text-burgundy-500 hover:underline">
-              Click Here
-            </Link>
-          </p>
         </div>
       </div>
     </div>

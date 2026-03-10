@@ -156,7 +156,7 @@ function TenantSignup() {
                   value={formData.firstName}
                   onChange={handleChange}
                   placeholder="John"
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
                 />
                 {fieldErrors.firstName && (
                   <p className="text-red-500 text-xs mt-1">
@@ -174,7 +174,7 @@ function TenantSignup() {
                   value={formData.lastName}
                   onChange={handleChange}
                   placeholder="Doe"
-                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                  className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
                 />
                 {fieldErrors.lastName && (
                   <p className="text-red-500 text-xs mt-1">
@@ -203,7 +203,7 @@ function TenantSignup() {
                   }));
                 }}
                 placeholder="0712345678"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
 
@@ -217,7 +217,7 @@ function TenantSignup() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="johndoe@gmail.com"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
 
@@ -236,10 +236,10 @@ function TenantSignup() {
                 placeholder="••••••••"
                 className={`mt-1 block w-full border ${
                   fieldErrors.password ? "border-red-500" : "border-gray-300"
-                } rounded-full shadow-sm py-2.5 px-4 text-sm focus:outline-none focus:ring-2 ${
+                } rounded-md shadow-sm py-2.5 px-4 text-sm focus:outline-none focus:ring-2 ${
                   fieldErrors.password
-                    ? "focus:ring-red-500"
-                    : "focus:ring-blue-500"
+                    ? "focus:ring-red-100"
+                    : "focus:ring-pink-100"
                 }`}
               />
               <span
@@ -258,7 +258,7 @@ function TenantSignup() {
             {/* Signup Button */}
             <button
               type="submit"
-              className={`w-full py-3 text-white rounded-full transition duration-200 cursor-pointer ${
+              className={`w-full py-3 text-white rounded-md transition duration-200 cursor-pointer ${
                 loading
                   ? "bg-gray-400"
                   : "bg-burgundy-500 hover:bg-burgundy-400"
@@ -266,7 +266,7 @@ function TenantSignup() {
               disabled={loading}
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-gray-300 rounded-full animate-spin border-t-transparent"></div>
+                <div className="w-5 h-5 border-2 border-gray-300 rounded-md animate-spin border-t-transparent"></div>
               ) : (
                 "SIGN UP"
               )}
@@ -284,23 +284,12 @@ function TenantSignup() {
             </Link>
           </p>
 
-          {/* Divider */}
+          {/* Divider
           <div className="flex items-center justify-center space-x-2">
             <hr className="w-1/4 border-gray-300" />
             <span className="text-md text-gray-500">Or</span>
             <hr className="w-1/4 border-gray-300" />
-          </div>
-
-          {/* Administrator Signup */}
-          <p className="text-center text-md text-gray-600">
-            Are you an administrator?{" "}
-            <Link
-              to="/administrator/signup"
-              className="text-burgundy-500 hover:underline font-semibold hover:text-pink-950"
-            >
-              Click Here
-            </Link>
-          </p>
+          </div> */}
         </div>
       </div>
     </div>

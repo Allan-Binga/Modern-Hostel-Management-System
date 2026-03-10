@@ -43,7 +43,7 @@ function AdministratorLogin() {
 
       toast.success("Login successful.");
       setTimeout(() => {
-        navigate("/administrator/home");
+        navigate("/prestige-admin/home");
       }, 4000);
     } catch (error) {
       const errorMessage = error.message?.toLowerCase?.();
@@ -53,7 +53,7 @@ function AdministratorLogin() {
           className:
             "bg-blue-100 text-blue-800 font-medium rounded-md p-3 shadow",
         });
-        navigate("/administrator/home");
+        navigate("/prestige-admin/home");
       } else {
         toast.error(error.message || "Something went wrong");
       }
@@ -105,7 +105,7 @@ function AdministratorLogin() {
                 value={formData.email}
                 onChange={handleChange}
                 placeholder="johndoe@gmail.com"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
             </div>
 
@@ -119,7 +119,7 @@ function AdministratorLogin() {
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="••••••••"
-                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-pink-100 focus:outline-none"
+                className="mt-1 w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-pink-100 focus:outline-none"
               />
               <span
                 className="absolute right-3 top-10 text-gray-500 cursor-pointer"
@@ -132,7 +132,7 @@ function AdministratorLogin() {
             {/* SignIn Button */}
             <button
               type="submit"
-              className="w-full py-3 bg-burgundy-500 text-white rounded-full hover:bg-burgundy-400 transition duration-200 cursor-pointer"
+              className="w-full py-3 bg-burgundy-500 text-white rounded-md hover:bg-burgundy-400 transition duration-200 cursor-pointer"
             >
               SIGN IN
             </button>
@@ -143,25 +143,10 @@ function AdministratorLogin() {
           <p className="text-center text-md text-gray-600 font-semibold">
             Don't have an account?{" "}
             <Link
-              to="/administrator/signup"
+              to="/prestige-admin/signup"
               className="text-burgundy-500 hover:underline"
             >
               Sign Up
-            </Link>
-          </p>
-
-          {/* Divider */}
-          <div className="flex items-center justify-center space-x-2">
-            <hr className="w-1/4 border-gray-300" />
-            <span className="text-md text-gray-500">Or</span>
-            <hr className="w-1/4 border-gray-300" />
-          </div>
-
-          {/* Administrator Signup */}
-          <p className="text-center text-md text-gray-600 font-semibold">
-            Are you a resident?{" "}
-            <Link to="/login" className="text-burgundy-500 hover:underline">
-              Click Here
             </Link>
           </p>
         </div>

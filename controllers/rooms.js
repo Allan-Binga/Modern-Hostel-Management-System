@@ -4,9 +4,25 @@ const client = require("../config/db");
 //Get Rooms
 const getRooms = async (req, res) => {
   try {
-    const rooms = await client.query("SELECT * FROM rooms");
-    res.status(200).json(rooms.rows);
+    const { status } = req.query; // e.g., ?status=Available
+
+    // Base query: fetch rooms that are not soft deleted
+    let query = "SELECT * FROM rooms WHERE deleted_at IS NULL";
+    const values = [];
+
+    // Add filter if status is provided
+    if (status) {
+      query += " AND status = $1";
+      values.push(status);
+    }
+
+    query += " ORDER BY roomid ASC"; // optional: order rooms by ID
+
+    const result = await client.query(query, values);
+
+    res.status(200).json(result.rows);
   } catch (error) {
+    console.error("Error fetching rooms:", error);
     res.status(500).json({ message: "Could not fetch rooms." });
   }
 };
@@ -54,7 +70,7 @@ const updateRoom = async (req, res) => {
     }
 
     // Validate field keys (only allow valid columns)
-    const allowedFields = ['room_type', 'status', 'price', 'beds', 'image'];
+    const allowedFields = ['roomtype', 'status', 'price', 'beds', 'image'];
     const setClauses = [];
     const values = [];
     let index = 1;
@@ -71,7 +87,7 @@ const updateRoom = async (req, res) => {
     const updateQuery = `
       UPDATE rooms
       SET ${setClauses.join(", ")}
-      WHERE id = $${index}
+      WHERE roomid = $${index}
       RETURNING *
     `;
 
@@ -90,5 +106,37 @@ const updateRoom = async (req, res) => {
   }
 };
 
+//Delete Room
+const deleteRoom = async (req, res) => {
+  try {
+    const { id } = req.params;
 
-module.exports = { getRooms, createARoom, updateRoom };
+    // Soft delete only if room is Available
+    const softDeleteQuery = `
+      UPDATE rooms
+      SET deleted_at = NOW(),
+          status = 'Unavailable'
+      WHERE roomid = $1 AND deleted_at IS NULL AND status = 'Available'
+      RETURNING *
+    `;
+
+    const result = await client.query(softDeleteQuery, [id]);
+
+    if (result.rowCount === 0) {
+      return res.status(400).json({
+        message: "Room cannot be deleted. It may be occupied, pending, or already deleted.",
+      });
+    }
+
+    res.status(200).json({
+      message: "Room deleted successfully",
+      room: result.rows[0],
+    });
+
+  } catch (error) {
+    console.error("Error deleting room:", error);
+    res.status(500).json({ message: "Could not delete room." });
+  }
+};
+
+module.exports = { getRooms, createARoom, updateRoom, deleteRoom };

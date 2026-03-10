@@ -32,9 +32,11 @@ app.use(express.json());
 //CORS Implementation
 const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:5174",
   "http://159.65.23.201:5900",
   "https://www.prestigegirlshostel.co.ke",
-  "https://prestigegirlshostel.co.ke"
+  "https://prestigegirlshostel.co.ke",
+  "https://admin.prestigegirlshostel.co.ke"
 ];
 
 const corsOptions = {
@@ -84,22 +86,6 @@ app.use("/prestige-hostel/v1/users", usersRoute);
 app.use("/prestige-hostel/v1/payments", paymentRoutes);
 app.use("/prestige-hostel/v1/password", require("./routes/password"));
 
-
-
-// Serve static files in production
-if (process.env.NODE_ENV === "production") {
-  const clientDistPath = path.join(__dirname, "client", "dist");
-  app.use(express.static(clientDistPath));
-
-  // Fallback for frontend routes
-  app.use((req, res, next) => {
-    if (req.method === "GET" && !req.path.startsWith("/prestige")) {
-      res.sendFile(path.join(clientDistPath, "index.html"));
-    } else {
-      next();
-    }
-  });
-}
 
 // Start the server only if not in test environment
 if (process.env.NODE_ENV !== "test") {
